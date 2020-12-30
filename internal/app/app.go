@@ -51,7 +51,7 @@ func NewApp(key, secret, url, version string, port int) (*App, error) {
 		logger:        logger,
 		appVersion:    version,
 		hostPort:      fmt.Sprintf("0.0.0.0:%d", port),
-		maxEventLimit: 30, // TODO: parameterize
+		maxEventLimit: 20, // TODO: parameterize
 	}, nil
 }
 

@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mchmarny/followme/internal/data"
+	"github.com/mchmarny/followme/pkg/list"
 	"github.com/pkg/errors"
 )
 
@@ -46,7 +47,7 @@ func (a *App) dayHandler(c *gin.Context) {
 		newFollowersLimit = true
 	}
 
-	followers, err := a.toUserEvent(ctx, forUser, profile.ID, newFollowerIDs, isoDate, data.FollowedEventType)
+	followers, err := a.toUserEvent(ctx, forUser, profile.ID, dayState.Friends, newFollowerIDs, isoDate, data.FollowedEventType, false)
 	if err != nil {
 		a.viewErrorHandler(c, http.StatusInternalServerError, err, "Error getting new follower events")
 		return
@@ -60,7 +61,7 @@ func (a *App) dayHandler(c *gin.Context) {
 		newUnfollowersLimit = true
 	}
 
-	unfollowers, err := a.toUserEvent(ctx, forUser, profile.ID, newUnfollowerIDs, isoDate, data.UnfollowedEventType)
+	unfollowers, err := a.toUserEvent(ctx, forUser, profile.ID, dayState.Friends, newUnfollowerIDs, isoDate, data.UnfollowedEventType, false)
 	if err != nil {
 		a.viewErrorHandler(c, http.StatusInternalServerError, err, "Error getting unfollower events")
 		return
@@ -74,7 +75,7 @@ func (a *App) dayHandler(c *gin.Context) {
 		newFriendLimited = true
 	}
 
-	friended, err := a.toUserEvent(ctx, forUser, profile.ID, newFriendedIDs, isoDate, data.FriendedEventType)
+	friended, err := a.toUserEvent(ctx, forUser, profile.ID, dayState.Friends, newFriendedIDs, isoDate, data.FriendedEventType, true)
 	if err != nil {
 		a.viewErrorHandler(c, http.StatusInternalServerError, err, "Error getting friended events")
 		return
@@ -88,7 +89,7 @@ func (a *App) dayHandler(c *gin.Context) {
 		newUnfriendLimited = true
 	}
 
-	unfriended, err := a.toUserEvent(ctx, forUser, profile.ID, newUnfriendedIDs, isoDate, data.UnfriendedEventType)
+	unfriended, err := a.toUserEvent(ctx, forUser, profile.ID, dayState.Friends, newUnfriendedIDs, isoDate, data.UnfriendedEventType, true)
 	if err != nil {
 		a.viewErrorHandler(c, http.StatusInternalServerError, err, "Error getting unfriended events")
 		return
@@ -122,7 +123,7 @@ func (a *App) dayHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "day", data)
 }
 
-func (a *App) toUserEvent(ctx context.Context, forUser *data.User, userID int64, ids []int64, isoDate, eventType string) (events []*data.UserEvent, err error) {
+func (a *App) toUserEvent(ctx context.Context, forUser *data.User, userID int64, friends, ids []int64, isoDate, eventType string, loadRel bool) (events []*data.UserEvent, err error) {
 	a.logger.Printf("%s events for user %s - %d", eventType, forUser.Username, len(ids))
 	if len(ids) > 0 {
 		users, err := a.twClient.GetUserDetailsFromIDs(ctx, forUser, ids)
@@ -131,20 +132,24 @@ func (a *App) toUserEvent(ctx context.Context, forUser *data.User, userID int64,
 		}
 		a.logger.Printf("found: %d", len(users))
 		for _, u := range users {
-			// a.logger.Printf("user: %s", u.Username)
-			rel, err := a.twClient.GetRelationship(ctx, forUser, userID, u.ID)
-			if err != nil {
-				return nil, errors.Wrap(err, "error getting user relationship")
-			}
-			a.logger.Printf("source:%d target:%d - %+v", userID, u.ID, rel)
 			event := &data.UserEvent{
-				Profile:     u,
-				EventDate:   isoDate,
-				EventType:   eventType,
-				EventUser:   forUser.Username,
-				IsFriend:    rel.Source.Following,
-				IsFollowing: rel.Target.Following,
+				Profile:   u,
+				EventDate: isoDate,
+				EventType: eventType,
+				EventUser: forUser.Username,
+				IsFriend:  list.Contains(friends, u.ID),
 			}
+
+			if loadRel {
+				// a.logger.Printf("user: %s", u.Username)
+				rel, err := a.twClient.GetRelationship(ctx, forUser, userID, u.ID)
+				if err != nil {
+					return nil, errors.Wrap(err, "error getting user relationship")
+				}
+				a.logger.Printf("source:%d target:%d - %+v", userID, u.ID, rel)
+				event.IsFollowing = rel.Target.Following
+			}
+
 			events = append(events, event)
 		}
 	}
