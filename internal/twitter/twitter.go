@@ -64,7 +64,7 @@ func (t *Twitter) GetUserDetailsFromIDs(ctx context.Context, byUser *data.User, 
 		return nil, errors.Wrap(err, "ids required")
 	}
 	// logger.Printf("getting twitter profiles for %d ids", len(ids))
-	p, err := pager.GetInt64ArrayPager(ids, 100)
+	p, err := pager.GetInt64ArrayPager(ids, 100, 0)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating pager")
 	}

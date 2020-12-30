@@ -8,102 +8,43 @@
 
     <h3>Daily events for {{ .date }}</h3>
 
-    <!-- Table 1 -->
-    {{if .hasFollowers }}
-    <div class="list-table-wrapper">
-        <h3>
-            {{ .state.NewFollowerCount }} accounts followed you
-            {{if .followersLimited }}
-                (trimmed, showing last {{ .eventLimit }}) 
-            {{ end }}
-        </h3>
-        <table class="list-table">
-            <tr>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th>You&nbsp;Follow</th>
-                <th>Friends</th>
-                <th>Followers</th>
-                <th>Tweets</th>
-                <th>Listed</th>
-            </tr>
-            {{ template "followers" .followers }}
+    <div class="error-msg"></div>
+
+    <div id="meta-panel">
+        <form>
+            <input type="hidden" name="selectedDate" id="selectedDate" value="{{ .date }}" />
+            List: 
+            <select id="list-selector">
+                {{ range $key, $value := .listTypes }}
+                    <option value="{{ $key }}">{{ $value }}</option>
+                {{ end }}
+            </select>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="list-table-wrapper"  class="after-load">
+        <table class="list-table" id="events-table">
+            <thead>
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>Follow(s/ed)</th>
+                    <th>Friends</th>
+                    <th>Followers</th>
+                    <th>Tweets</th>
+                    <th>Listed</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
         </table>
     </div>
-    {{ end }}
 
-    <!-- Table 2 -->
-    {{if .hasUnfollowers }}
-    <div class="list-table-wrapper">
-        <h3>
-            {{ .state.NewUnfollowerCount }} accounts unfollowed you (or been deleted)
-            {{if .unfollowersLimited }}
-                (trimmed, showing last {{ .eventLimit }}) 
-            {{ end }}
-        </h3>
-        <table class="list-table">
-            <tr>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th>You&nbsp;Follow</th>
-                <th>Friends</th>
-                <th>Followers</th>
-                <th>Tweets</th>
-                <th>Listed</th>
-            </tr>
-            {{ template "followers" .unfollowers }}
-        </table>
+    <div class="page-nav">
+        <a href="#" id="day-list-prev" data-page="0">Prev</a> | <a href="#" id="day-list-next" data-page="2">Next</a>
     </div>
-    {{ end }}
-
-    <!-- Table 3 -->
-    {{if .hasFriended }}
-    <div class="list-table-wrapper">
-        <h3>
-            You friended {{ .state.NewFriendsCount }} accounts
-            {{if .friendedLimited }}
-                (trimmed, showing last {{ .eventLimit }}) 
-            {{ end }}
-        </h3>
-        <table class="list-table">
-            <tr>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th>Follows&nbsp;You</th>
-                <th>Friends</th>
-                <th>Followers</th>
-                <th>Tweets</th>
-                <th>Listed</th>
-            </tr>
-            {{ template "friends" .friended }}
-        </table>
-    </div>
-    {{ end }}
-
-
-    <!-- Table 4 -->
-    {{if .hasUnfriended }}
-    <div class="list-table-wrapper">
-        <h3>
-            You unfriended {{ .state.NewUnfriendedCount }} accounts 
-            {{if .unfriendedLimited }}
-                (trimmed, showing last {{ .eventLimit }}) 
-            {{ end }}
-        </h3>
-        <table class="list-table">
-            <tr>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th>Follows&nbsp;You</th>
-                <th>Friends</th>
-                <th>Followers</th>
-                <th>Tweets</th>
-                <th>Listed</th>
-            </tr>
-            {{ template "friends" .unfriended }}
-        </table>
-    </div>
-    {{ end }}
 
 </div>
 

@@ -10,6 +10,7 @@ import (
 	"github.com/mchmarny/followme/internal/data"
 	"github.com/mchmarny/followme/pkg/date"
 	"github.com/mchmarny/followme/pkg/format"
+	"github.com/mchmarny/followme/pkg/pager"
 	"github.com/pkg/errors"
 )
 
@@ -106,9 +107,136 @@ func (a *App) dashboardQueryHandler(c *gin.Context) {
 		"user":       profile,
 		"state":      state,
 		"version":    a.appVersion,
-		"updated_on": forUser.UpdatedAt,
+		"updated_on": state.UpdatedOn.Format(time.RFC1123),
 		"days":       days,
 		"series":     series,
+	})
+}
+
+func (a *App) dayQueryHandler(c *gin.Context) {
+	ctx := c.Request.Context()
+	forUser, err := a.getUser(c)
+	if err != nil {
+		a.errJSONAndAbort(c, err)
+		return
+	}
+
+	pageNum := 0
+	pageStr := c.Param("page")
+	if pageStr == "" {
+		pageStr = "1"
+	}
+	var pageErr error
+	pageNum, pageErr = strconv.Atoi(pageStr)
+	if pageErr != nil {
+		a.errJSONAndAbort(c, errors.Wrap(pageErr, "error parsing page number"))
+		return
+	}
+
+	isoDate := c.Param("day")
+	if isoDate == "" {
+		a.errJSONAndAbort(c, errors.New("date required"))
+		return
+	}
+
+	listType := c.Param("list")
+	if listType == "" {
+		a.errJSONAndAbort(c, errors.New("list type required"))
+		return
+	}
+
+	var state data.DailyState
+	stateKey := data.GetDailyStateKey(forUser.Username, time.Now().UTC())
+	if err := a.db.One("Key", stateKey, &state); err != nil {
+		a.errJSONAndAbort(c, errors.Wrapf(err, "error getting user state for %s", stateKey))
+		return
+	}
+
+	var profile data.Profile
+	if err := a.db.One("Username", forUser.Username, &profile); err != nil || profile.Username == "" {
+		a.errJSONAndAbort(c, errors.Wrapf(err, "error getting user profile for %s", forUser.Username))
+		return
+	}
+
+	var (
+		ids       []int64
+		eventType string
+	)
+
+	switch listType {
+	case data.FollowedEventType:
+		ids = state.NewFollowers
+		eventType = data.FollowedEventType
+
+	case data.UnfollowedEventType:
+		ids = state.NewUnfollowers
+		eventType = data.UnfollowedEventType
+
+	case data.FriendedEventType:
+		ids = state.NewFriends
+		eventType = data.FriendedEventType
+
+	case data.UnfriendedEventType:
+		ids = state.NewUnfriended
+		eventType = data.UnfriendedEventType
+
+	default:
+		a.errJSONAndAbort(c, errors.Wrapf(err, "invalid list type: %s", listType))
+		return
+	}
+
+	var events []*data.UserEvent
+
+	idPager, err := pager.GetInt64ArrayPager(ids, a.pageSize, pageNum)
+	if err != nil {
+		a.errJSONAndAbort(c, errors.Wrapf(err, "error creating pager for %d items, page size:%d, page num:%d", len(ids), a.pageSize, pageNum))
+		return
+	}
+
+	if len(ids) > 0 {
+		users, err := a.twClient.GetUserDetailsFromIDs(ctx, forUser, idPager.Next())
+		if err != nil {
+			a.errJSONAndAbort(c, errors.Wrap(err, "error getting user details"))
+			return
+		}
+
+		for _, u := range users {
+			event := &data.UserEvent{
+				Profile:   u,
+				EventDate: isoDate,
+				EventType: eventType,
+				EventUser: forUser.Username,
+			}
+
+			rel, err := a.twClient.GetRelationship(ctx, forUser, profile.ID, u.ID)
+			if err != nil {
+				a.errJSONAndAbort(c, errors.Wrap(err, "error getting user relationship"))
+				return
+			}
+
+			if eventType == data.FollowedEventType || eventType == data.UnfollowedEventType {
+				event.HasRelationship = format.ToYesNo(rel.Source.Following)
+			} else {
+				event.HasRelationship = format.ToYesNo(rel.Target.Following)
+			}
+
+			events = append(events, event)
+		} // end for users
+	} // end if len(ids) > 0
+
+	c.JSON(http.StatusOK, gin.H{
+		"user":       profile,
+		"state":      state,
+		"version":    a.appVersion,
+		"updated_on": forUser.UpdatedAt,
+		"date":       isoDate,
+		"events":     events,
+		"listTyep":   listType,
+		"pageNum":    pageNum,
+		"pagePrev":   idPager.GetPrevPage(),
+		"pageNext":   idPager.GetNextPage(),
+		"hasPrev":    idPager.HasPrev(),
+		"hasNext":    idPager.HasNext(),
 	})
 }
 

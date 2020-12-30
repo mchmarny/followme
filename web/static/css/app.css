@@ -124,6 +124,13 @@ h3 {
 	padding: 10px;
 }
 
+#page-nav {
+	text-align: center;
+	margin: 10px 30px 0 30px;
+	font-size: 1.2em;
+	display: inline-block;
+}
+
 #meta-panel {
 	text-align: center;
 	margin: 10px 0 0 0;
@@ -372,4 +379,13 @@ h3 {
 	display: block;
 	color: rgb(250, 250, 250, 0.4);
 	padding-bottom: 3px;
+}
+
+.error-msg {
+	visibility: hidden;
+	color: red;
+	font-size: 1em;
+	break-after: always;
+	display: block;
+	text-align: center;
 }

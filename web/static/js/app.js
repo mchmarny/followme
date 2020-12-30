@@ -6,20 +6,71 @@ $(function () {
         });
     };
 
-    $(".user-data-row").on("mouseover", function() {
-        $(this).closest("tr").addClass("highlight");
-        $(this).closest("table").find(".user-data-row:nth-child(" + ($(this).index() + 1) + ")").addClass("highlight");
-    });
-
-    $(".user-data-row").on("mouseout", function() {
-        $(this).closest("tr").removeClass("highlight");
-        $(this).closest("table").find(".user-data-row:nth-child(" + ($(this).index() + 1) + ")").removeClass("highlight");
-    });
-
     $(".user-data-row").click(function(){
         window.open("https://twitter.com/" + $(this).data('user'), "_blank");
-     });
+    });
+
+    if ($("#list-selector").length) {
+        $("#list-selector").change(function(){
+            loadDay($("#selectedDate").val(), $(this).val(), 1); // on change
+        });
+        $("#day-list-prev, #day-list-next").click(function(e){
+            e.preventDefault();
+            loadDay($("#selectedDate").val(), $("#list-selector").val(), $(this).data("page")); // on click
+        });
+
+        loadDay($("#selectedDate").val(), $("#list-selector").val(), 1); // on load
+    };
 });
+
+function loadDay(selectedDate, listType, page) {
+    $(".after-load").hide();
+    var table = $("#events-table tbody")
+    table.empty();
+    queryURL = "/data/day/" + selectedDate + "/list/" + listType + "/page/" + page;
+    console.log("Query URL: " + queryURL);
+    $.get(queryURL, function (data) {
+        console.log(data);
+
+        $("#day-list-prev").data("page", data.pagePrev);
+        $("#day-list-next").data("page", data.pageNext);
+        
+        $.each(data.events, function(rowIndex, e) {
+            var row = $(`<tr class="user-data-row" data-user="${e.username}"/>`);
+            row.append(`<td class="user-img">
+                    <a href="https://twitter.com/${e.username}" 
+                    title="${e.description} - (updated: ${e.updated_at})"
+                    target="_blank"><img src="${e.profile_image}" class="profile-image" />
+                    </a>
+                </td>`);
+            row.append(`<td class="user-name">
+                <a href="https://twitter.com/${e.username}" 
+                title="${e.description} - (updated: ${e.updated_at})" 
+                target="_blank">@${e.username}</a><div>${e.name}<br />${e.location}</div>
+                </td>`);
+            row.append(`<td class="user-data"><div>${e.has_relation}</div></td>`); 
+            row.append(`<td class="user-data"><div>${e.friend_count}</div></td>`); 
+            row.append(`<td class="user-data"><div>${e.followers_count}</div></td>`); 
+            row.append(`<td class="user-data"><div>${e.post_count}</div></td>`); 
+            row.append(`<td class="user-data"><div>${e.listed_count}</div></td>`); 
+            table.append(row);
+        });
+
+        $(".user-data-row").on("mouseover", function() {
+            $(this).closest("tr").addClass("highlight");
+            $(this).closest("table").find(".user-data-row:nth-child(" + ($(this).index() + 1) + ")").addClass("highlight");
+        });
+    
+        $(".user-data-row").on("mouseout", function() {
+            $(this).closest("tr").removeClass("highlight");
+            $(this).closest("table").find(".user-data-row:nth-child(" + ($(this).index() + 1) + ")").removeClass("highlight");
+        });
+    
+    }).fail(function(err) {
+        console.log("error loading date data");
+        $("#error-msg").html("Error loading date data, see logs for details.").show()
+    });
+}
 
 function loadDashboard(days) {
     $(".after-load").hide();
@@ -34,7 +85,7 @@ function loadDashboard(days) {
         $("#follower-lost-count .data").text(data.state.new_unfollower_count).digits();
         $("#listed-count .data").text(data.user.listed_count).digits();
         $("#post-count .data").text(data.user.post_count).digits();
-        $("#meta-updated-on").text(toLongTime(data.updated_on));
+        $("#meta-updated-on").text(data.updated_on);
 
         $(".wait-load").hide();
         $(".after-load").show();
@@ -210,11 +261,6 @@ function loadDashboard(days) {
 
 function redirectToDate(d) {
     $(location).attr("href", "/view/day/" + d);
-}
-
-function toLongTime(v) {
-    var ts = new Date(v)
-    return ts.toUTCString()
 }
 
 function makeLinks() {

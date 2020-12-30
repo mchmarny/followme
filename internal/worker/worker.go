@@ -151,6 +151,7 @@ func (w *Worker) updateUser(ctx context.Context, forUser data.User) error {
 	todayState.NewUnfriended = newUnfriendsIDs
 	todayState.NewUnfriendedCount = len(newUnfriendsIDs)
 
+	todayState.UpdatedOn = time.Now().UTC()
 	// ============================================================================
 	// Save State
 	// ============================================================================

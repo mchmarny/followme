@@ -39,9 +39,8 @@ func (e *DayEvent) GetFormattedEventType() string {
 // UserEvent wraps simple twitter user as an time event
 type UserEvent struct {
 	*Profile
-	EventDate   string `json:"event_at"`
-	EventType   string `json:"event_type"`
-	EventUser   string `json:"event_user"`
-	IsFriend    bool   `json:"is_friend"`
-	IsFollowing bool   `json:"is_following"`
+	EventDate       string `json:"event_at"`
+	EventType       string `json:"event_type"`
+	EventUser       string `json:"event_user"`
+	HasRelationship string `json:"has_relation"`
 }

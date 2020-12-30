@@ -10,9 +10,10 @@ import (
 // DailyState represents daily user state
 type DailyState struct {
 	// meta
-	Key      string `storm:"id" json:"jey"`
-	Username string `json:"username"`
-	StateOn  string `json:"date"`
+	Key       string    `storm:"id" json:"jey"`
+	Username  string    `json:"username"`
+	StateOn   string    `json:"date"`
+	UpdatedOn time.Time `json:"updated_on"`
 
 	// follower
 	Followers     []int64 `json:"followers"`
