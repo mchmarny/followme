@@ -1,0 +1,375 @@
+/*
+	Cloud Run colors
+	Light Blue: #4786F0
+
+*/
+
+canvas {
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+}
+
+html,
+body {
+	height: 100%;
+	font-family: Verdana, Geneva, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: #444;
+    color: #e4e4e4;
+}
+
+a {
+  color: #1DA1F2;
+}
+
+h3 {
+	font-size: 1.5em;
+	font-weight: bold;
+	color: rgb(109, 110, 110);
+}
+
+#wrapper {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	text-align: center;
+	widows: 100%;
+	text-align: center;
+}
+
+#page-header {
+	padding: 5px 20px;
+	margin: 0;
+	background-color: #333;
+	text-align: left;
+	height: 70px;
+}
+
+#logo {
+	width: 70px;
+	height: 70px;
+	border: 0;
+	float: left;
+}
+
+#header-title {
+	font-size: 1.5em;
+	font-weight: bold;
+	float: left;
+	height: 70px;
+	margin: 20px 0 0 10px;
+	color: rgb(109, 110, 110);
+}
+
+#header-nav {
+	display: block;
+	position: absolute;
+	top: 13px;
+	right: 75px;
+	text-align: right;
+	line-height: 150%;
+}
+
+#header-pic {
+	display: block;
+	position: absolute;
+	top: 13px;
+	right: 15px;
+}
+
+#page-footer {
+	padding: 20px 0 40px 0;
+}
+
+
+#numbers-section {
+	padding: 20px 0 0 0;
+	width: 80%;
+	text-align: center;
+	break-after: always;
+	display: inline-flex;
+	justify-content: center;
+}
+
+#numbers-section .number-item {
+	background-color: rgb(109, 110, 110);
+	color: rgb(40, 40, 40);
+  	border-radius: 4px;
+  	padding: 15px;
+	font-size: 1.1em;
+	font-weight: bold;
+	align-content: center;
+	float: left;
+	margin-right: 20px;
+	width: 220px;
+}
+
+#day-selector {
+	background-color: rgb(109, 110, 110);	
+}
+
+
+#numbers-section:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+#numbers-section .data {
+	font-weight: bold;
+	color: rgb(27, 27, 27);
+	font-size: 2em;
+	padding: 10px;
+}
+
+#meta-panel {
+	text-align: center;
+	margin: 10px 0 0 0;
+	font-size: 0.8em;
+}
+
+
+#middle-section {
+	text-align: center;
+	margin-top: 20px;
+}
+
+.chart-wrapper {
+	width: 80%;
+	break-after: always;
+	display: inline-block;
+	margin: 0 0 20px 0;
+}
+
+#follower-chart {
+	height: 300px;
+}
+
+#follower-count-chart {
+	height: 150px;
+}
+
+.list-table-wrapper {
+	width: 80%;
+	break-after: always;
+	display: inline-block;
+	margin-bottom: 25px;
+}
+
+.profile-wrapper {
+	width: 70%;
+	break-after: always;
+	display: inline-block;
+	margin-bottom: 25px;
+}
+
+.list-table-wrapper h3 {
+	font-size: 1em;
+  	color: rgb(250, 250, 250, 0.4);
+	padding: 5px;
+	margin: 5px 0 0 0;
+}
+
+.list-table {
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	border: 0;
+	text-align: left;
+	margin-top: 25px;
+}
+
+
+.highlight {
+    background-color: rgb(250, 250, 250, 0.2);
+}
+
+.list-table td {
+	border: 0;
+	border-bottom: 1pt solid #999;
+	padding: 7px;
+	margin: 0;
+}
+
+.list-table th {
+	text-align: center;
+	color: rgb(250, 250, 250, 0.4);
+}
+
+.user-img {
+	text-align: right;
+	width: 55px;
+}
+
+.user-name {
+	font-size: 0.8em;
+	vertical-align: top;
+	padding-top: 5px;
+}
+
+.user-name a {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+.user-name div {
+	margin-top: 3px;
+}
+
+.user-data {
+	text-align: center;
+	font-size: 0.9em;
+	width: 125px;
+	height: 50px;
+	color: #e4e4e4;
+}
+
+.user-data div {
+	font-weight: bold;
+	font-size: 1.4em;
+	margin-top: 3px;
+}
+
+.user-data b {
+	font-size: 0.7em;
+	margin-top: 3px;
+}
+
+.wait-load {
+	font-size: 1.2em;
+	text-align: center;
+	color: rgb(250, 250, 250, 1);
+	width: 80%;
+	break-after: always;
+	display: inline-block;
+	margin-top: 20px;
+}
+
+.right {
+	text-align: right;
+}
+
+.left {
+	text-align: left;
+}
+
+.form-action input, .form-action button {
+	border-bottom: 1pt solid #999;
+	color: #999;
+	background-color: #333;
+	font-size: 1.1em;
+	margin-right: 10px;
+	padding: 5px 10px;
+}
+
+
+.search-criterion-name {
+	font-size: 1em;
+	padding: 10px;
+}
+
+.search-criterion-name b {
+	font-size: 1.3em;
+	padding-bottom: 7px;
+}
+
+.search-criterion-action {
+	text-align: right;
+}
+
+.search-criterion-action a {
+	font-size: 1.3em;
+	font-weight: bold;
+	padding: 5px 20px;
+}
+
+.new-search-criterion-link {
+	margin-top: 5px;
+	width: 60%;
+	break-after: always;
+	display: inline-block;
+	text-align: right;
+	padding: 10px;
+	font-size: 0.8em;
+}
+
+
+.tweet-view-link {
+	text-align: right;
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+.tweet-text {
+	font-size: 1em;
+	line-height: 120%;
+	margin-bottom: 7px;
+	color: #e4e4e4;
+}
+
+.profile-image {
+	border: 1pt solid #e4e4e4;
+	filter: grayscale(80%);
+	padding: 0;
+	margin: 0;
+}
+
+.button {
+	background-color: #1DA1F2;
+	border: none;
+	border-radius: 12px;
+	color: white;
+	padding: 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 1.5em;
+	margin: 4px 2px;
+  }
+
+#profile-column-left {
+	width: 250px;
+	height: auto;
+	float: left;
+	text-align: right;
+  }
+
+#profile-column-left img {
+	width: 100px;
+	height: 100px;
+	margin: 0 20px 30px 0;
+  }
+
+.event-data {
+	margin: 0 20px 30px 0;
+	color: #e4e4e4;
+	text-align: right;
+}
+
+.event-data b {
+	break-after: always;
+	display: block;
+	color: rgb(250, 250, 250, 0.4);
+	padding-bottom: 3px;
+}
+
+#profile-column-right {
+	text-align: left;
+	width: 500px;
+	height: auto;
+	float: left;
+  }
+
+.profile-data {
+	  margin: 10px 10px 20px 10px;
+	  color:  #e4e4e4;
+  }
+
+.profile-data b {
+	break-after: always;
+	display: block;
+	color: rgb(250, 250, 250, 0.4);
+	padding-bottom: 3px;
+}

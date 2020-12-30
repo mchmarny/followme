@@ -1,0 +1,42 @@
+{{ define "friends" }}
+{{ range . }}
+
+<tr class="user-data-row" data-user="{{ .Username }}">
+    <td class="user-img">
+        <a href="https://twitter.com/{{ .Username }}" 
+           title="{{ .Description }} - User since: {{ .UserSince }}"
+           target="_blank"><img src="{{ .ProfileImage }}" class="profile-image" />
+        </a>
+    </td>
+
+    <td class="user-name">
+        <a href="https://twitter.com/{{ .Username }}" 
+           title="{{ .Description }} - User since: {{ .UserSince }}"
+           target="_blank">@{{ .Username }}
+        </a>
+        <div>
+            {{ .Name }}<br />
+            {{ .Location }}
+        </div>
+    </td>
+
+    <td class="user-data">
+        <div>{{ .FriendCount }}</div>
+    </td>
+
+    <td class="user-data">
+        <div>{{ .FollowerCount }}</div>
+    </td>
+
+    <td class="user-data">
+        <div>{{ .PostCount }}</div>
+    </td>
+
+    <td class="user-data">
+        <div>{{ .ListedCount }}</div>
+    </td>
+
+</tr>
+
+{{ end }}
+{{ end }}

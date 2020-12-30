@@ -1,0 +1,73 @@
+{{ define "dash" }}
+
+{{ template "header" . }}
+
+<!-- Numbers -->
+
+<div id="numbers-section" class="after-load">
+    <div class="number-item" id="follower-count">
+        <div>Followers</div>
+        <div class="data a"></div>
+    </div>
+    <div class="number-item" id="friend-count">
+        <div>You&nbsp;Follow</div>
+        <div class="data b"></div>
+    </div>
+    <div class="number-item" id="follower-gained-count">
+        <div>New&nbsp;Followers</div>
+        <div class="data c"></div>
+    </div>
+    <div class="number-item" id="follower-lost-count">
+        <div>Lost&nbsp;Followers</div>
+        <div class="data d"></div>
+    </div>
+    <div class="number-item" id="listed-count">
+        <div>Listed</div>
+        <div class="data e"></div>
+    </div>
+    <div class="number-item" id="post-count">
+        <div>Posts</div>
+        <div class="data b"></div>
+    </div>
+</div>
+
+<!-- End Numbers -->
+
+<div id="meta-panel" class="after-load">
+    <form>
+        Updated: <b id="meta-updated-on"></b>
+        &nbsp; 
+        Period: <select id="day-selector">
+            <option value="2">3 days</option>
+            <option value="6">1 week</option>
+            <option value="13">2 weeks</option>
+            <option value="20">3 weeks</option>
+            <option value="29">1 month</option>
+        </select>
+    </form>
+</div>
+
+<!-- Middle -->
+
+<div id="middle-section" class="after-load">
+
+    <!-- Chart 1 -->
+    <div class="chart-wrapper" id="follower-chart">
+        <canvas id="follower-event-series"></canvas>
+    </div>
+
+    <!-- Chart 2 -->
+    <div class="chart-wrapper" id="follower-count-chart">
+        <canvas id="follower-count-series"></canvas>
+    </div>
+
+</div>
+
+<div id="wait-panel" class="wait-load">Please wait, loading data...</div>
+
+<!-- End Middle -->
+
+
+{{ template "footer" . }}
+
+{{ end }}

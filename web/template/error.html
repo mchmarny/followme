@@ -1,0 +1,20 @@
+{{ define "error" }}
+{{ template "header" . }}
+
+<div id="middle-section">
+    <h3>Error</h3>
+    <p>
+        {{ .code }} -
+        {{if .msg }}
+        {{ .msg }}
+        {{ else }}
+        Internal server error
+        {{ end }}
+    </p>
+    <p>
+        See logs for more details.
+    </p>
+</div>
+
+{{ template "footer" . }}
+{{ end }}

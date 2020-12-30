@@ -1,0 +1,42 @@
+{{ define "header" }}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>tweethingz</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="tweethingz">
+    <meta name="keywords" content="twitter, service, api">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/static/img/favicon.ico" rel="shortcut icon" />
+    <link rel="stylesheet" href="/static/css/app.css?version={{ .version }}" />
+    <link rel="stylesheet" href="/static/css/chart.css?version={{ .version }}" />
+    <script src="/static/js/lib.js?version={{ .version }}"></script>
+    <script src="/static/js/chart.js?version={{ .version }}"></script>
+    <script src="/static/js/app.js?version={{ .version }}"></script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <!-- Header -->
+        <div id="page-header">
+            <a href="/">
+                <img src="/static/img/tweethingz-logo.svg" id="logo" title="tweethingz logo" />
+            </a>
+            <div id="header-title">
+                Your Twitter Followers
+            </div>
+            {{ if .user }}
+            <div id="header-nav">
+                <b><a href="https://twitter.com/{{ .user.Username }}" target="_blank">@{{ .user.Username }}</a></b>
+                <br />
+                <a href="/view/dash">Dashboard</a> |
+                <a href="/auth/logout">Log out</a>
+            </div>
+            <img src="{{ .user.ProfileImage }}" id="header-pic" class="profile-image"
+                title="Profile image for {{ .user.Username }}" />
+            {{ end }}
+        </div>
+
+        <!-- End Header -->
+        {{end}}
