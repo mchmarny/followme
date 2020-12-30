@@ -15,6 +15,7 @@ type Profile struct {
 	ProfileImage  string    `json:"profile_image"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
+	Following     bool      `json:"following"`
 	Lang          string    `json:"lang"`
 	Location      string    `json:"location"`
 	Timezone      string    `json:"time_zone"`

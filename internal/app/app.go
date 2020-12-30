@@ -45,23 +45,25 @@ func NewApp(key, secret, url, version string, port int) (*App, error) {
 	}
 
 	return &App{
-		db:          db,
-		twClient:    t,
-		authService: as,
-		logger:      logger,
-		appVersion:  version,
-		hostPort:    fmt.Sprintf("0.0.0.0:%d", port),
+		db:            db,
+		twClient:      t,
+		authService:   as,
+		logger:        logger,
+		appVersion:    version,
+		hostPort:      fmt.Sprintf("0.0.0.0:%d", port),
+		maxEventLimit: 30, // TODO: parameterize
 	}, nil
 }
 
 // App represents the app
 type App struct {
-	db          *storm.DB
-	twClient    *twitter.Twitter
-	logger      *log.Logger
-	authService *oauth1a.Service
-	hostPort    string
-	appVersion  string
+	db            *storm.DB
+	twClient      *twitter.Twitter
+	logger        *log.Logger
+	authService   *oauth1a.Service
+	hostPort      string
+	appVersion    string
+	maxEventLimit int
 }
 
 // Run starts the app and blocks while running.

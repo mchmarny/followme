@@ -10,6 +10,7 @@ import (
 	"github.com/mchmarny/followme/internal/data"
 	"github.com/mchmarny/followme/internal/twitter"
 	"github.com/mchmarny/followme/pkg/format"
+	"github.com/mchmarny/followme/pkg/list"
 	"github.com/pkg/errors"
 )
 
@@ -110,25 +111,25 @@ func (w *Worker) updateUser(ctx context.Context, forUser data.User) error {
 	// ============================================================================
 	// New Followers
 	// ============================================================================
-	newFollowerIDs := data.GetDiff(yesterdayState.Followers, followerIDs)
+	newFollowerIDs := list.GetDiff(yesterdayState.Followers, followerIDs)
 	w.logger.Printf("New Followers (y:%d, +:%d)", yesterdayState.FollowerCount, len(newFollowerIDs))
 
 	// ============================================================================
 	// New Unfollowers
 	// ============================================================================
-	newUnfollowerIDs := data.GetDiff(followerIDs, yesterdayState.Followers)
+	newUnfollowerIDs := list.GetDiff(followerIDs, yesterdayState.Followers)
 	w.logger.Printf("New Unfollowers (y:%d, -:%d)", yesterdayState.FollowerCount, len(newUnfollowerIDs))
 
 	// ============================================================================
 	// New Friends
 	// ============================================================================
-	newFriendsIDs := data.GetDiff(yesterdayState.Friends, friendIDs)
+	newFriendsIDs := list.GetDiff(yesterdayState.Friends, friendIDs)
 	w.logger.Printf("New Friends (y:%d, +:%d)", yesterdayState.FriendsCount, len(newFriendsIDs))
 
 	// ============================================================================
 	// New Unfriends
 	// ============================================================================
-	newUnfriendsIDs := data.GetDiff(friendIDs, yesterdayState.Friends)
+	newUnfriendsIDs := list.GetDiff(friendIDs, yesterdayState.Friends)
 	w.logger.Printf("New Unfriends (y:%d, -:%d)", yesterdayState.FriendsCount, len(newUnfriendsIDs))
 
 	// ============================================================================

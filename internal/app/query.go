@@ -8,6 +8,7 @@ import (
 	"github.com/asdine/storm/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/mchmarny/followme/internal/data"
+	"github.com/mchmarny/followme/pkg/date"
 	"github.com/mchmarny/followme/pkg/format"
 	"github.com/pkg/errors"
 )
@@ -67,7 +68,7 @@ func (a *App) dashboardQueryHandler(c *gin.Context) {
 	var runSum float32 = 0
 	var totalAvg float32 = 0
 
-	for i, date := range data.GetDateRange(time.Now().UTC().AddDate(0, 0, -days)) {
+	for i, date := range date.GetDateRange(time.Now().UTC().AddDate(0, 0, -days)) {
 		day := i + 1
 		dayState, err := a.getState(forUser.Username, date)
 		if err != nil {

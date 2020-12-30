@@ -25,7 +25,6 @@ var (
 	userCookieDuration = 60 * 60 * 24 * 30 // month in sec
 	maxSessionAge      = 5.0               // min
 	sessionCookieAge   = 5 * 60            // maxSessionAge in secs
-	maxEventLimit      = 100
 )
 
 // AuthSession represents the authenticated user session

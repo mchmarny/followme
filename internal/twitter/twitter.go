@@ -129,6 +129,7 @@ func toSimpleUser(u *tw.User) *data.Profile {
 		Description:   u.Description,
 		ProfileImage:  u.ProfileImageURLHttps,
 		CreatedAt:     convertTwitterTime(u.CreatedAt),
+		Following:     u.Following,
 		Lang:          u.Lang,
 		Location:      u.Location,
 		Timezone:      u.Timezone,
@@ -179,7 +180,6 @@ func (t *Twitter) GetFollowerIDs(ctx context.Context, byUser *data.User) (ids []
 
 // GetFriendIDs returns all IDs users following authed user
 func (t *Twitter) GetFriendIDs(ctx context.Context, byUser *data.User) (ids []int64, err error) {
-
 	client, err := t.getClient(ctx, byUser)
 	if err != nil {
 		return nil, errors.Wrap(err, "error initializing client")
@@ -212,4 +212,24 @@ func (t *Twitter) GetFriendIDs(ctx context.Context, byUser *data.User) (ids []in
 	}
 
 	return
+}
+
+// GetRelationship returns relationship between the source and the target
+func (t *Twitter) GetRelationship(ctx context.Context, byUser *data.User, sourceID, targetID int64) (*tw.Relationship, error) {
+	client, err := t.getClient(ctx, byUser)
+	if err != nil {
+		return nil, errors.Wrap(err, "error initializing client")
+	}
+
+	params := &tw.FriendshipShowParams{
+		SourceID: sourceID,
+		TargetID: targetID,
+	}
+
+	rel, resp, err := client.Friendships.Show(params)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error paging following IDs (%s): %v", resp.Status, err)
+	}
+
+	return rel, nil
 }
