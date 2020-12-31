@@ -165,6 +165,7 @@ jobs:
           ASSET_URL=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/mchmarny/followme/releases/tags/${RELEASE_TAG}" | jq '.assets[] | select(.name=="followme") | .url')
           ASSET_SHA=$(curl -L -f -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" $ASSET_URL 2> \
             /dev/null | shasum -a 256 | sed -n 's/\(.*\) -/\1/p' | xargs -I {} echo {})
+          echo "release sha: '${ASSET_SHA}'"
           echo "ASSET_SHA=${ASSET_SHA}" >> $GITHUB_ENV
           
       - name: Formula
