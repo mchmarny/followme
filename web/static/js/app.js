@@ -25,9 +25,9 @@ function loadDay(listType, page) {
     var table = $("#events-table tbody");
     table.empty();
     queryURL = "/data/day/" + selectedDate + "/list/" + listType + "/page/" + page;
-    console.log("Query URL: " + queryURL);
+    // console.log("Query URL: " + queryURL);
     $.get(queryURL, function (data) {
-        console.log(data);
+        //console.log(data);
 
         var prevLink = $("#day-list-prev");
         var nextLink = $("#day-list-next");
@@ -82,17 +82,19 @@ function loadDay(listType, page) {
             window.open("https://twitter.com/" + $(this).data('user'), "_blank");
         });
     
-    }).fail(function(err) {
-        console.log("error loading date data");
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(errorThrown);
         $("#error-msg").html("Error loading date data, see logs for details.").show()
     });
 }
 
 function loadDashboard(days) {
     $(".after-load").hide();
-    console.log("period days: " + days);
+    // console.log("period days: " + days);
     $.get("/data/dash?days=" + days, function (data) {
-        console.log(data);
+        // console.log(data);
 
         // numbers
         $("#follower-count .data").text(data.state.follower_count).digits();
@@ -269,9 +271,12 @@ function loadDashboard(days) {
 
 
 
-    }).fail(function() {
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(errorThrown);
         console.log("error loading twitter data");
-        $(location).attr("href", "/logout");
+        // $(location).attr("href", "/logout");
     });
 }
 
