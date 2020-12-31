@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.target_os }}_${{ matrix.target_arch }} (${GITHUB_REF:10})
+    name: Build ${{ matrix.target_os }}_${{ matrix.target_arch }}
     runs-on: ${{ matrix.os }}
     env:
       GO_VER: 1.15
@@ -84,7 +84,7 @@ jobs:
         path: ${{ env.OUT_DIR }}
 
   publish:
-    name: Publish ${{ github.ref }}
+    name: Publish
     needs: build
     env:
       ARTIFACT_DIR: ./release
@@ -141,7 +141,7 @@ jobs:
           asset_content_type: application/octet-stream
 
   installer:
-    name: Installer ${GITHUB_REF#refs/*/}
+    name: Installer
     needs: publish
     runs-on: ubuntu-latest
     steps:
