@@ -111,7 +111,6 @@ func (a *App) Run() error {
 	// port
 	a.logger.Printf("App starting: %s \n", a.hostPort)
 	if err := r.Run(a.hostPort); err != nil {
-		// TODO: gracefull shotdown
 		return errors.Wrap(err, "error while running app server")
 	}
 	return nil

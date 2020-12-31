@@ -29,7 +29,7 @@ worker: ## Runs compiled worker
 spell: ## Checks spelling across the entire project 
 	go get github.com/client9/misspell/cmd/misspell
 	go mod tidy
-	misspell -locale US -error cmd/**/* build/**/* pkg/**/* tools/**/* web/**/* ./...
+	misspell -locale US cmd/**/* internal/**/* pkg/**/* web/**/* README.md
 
 .PHONY: lint 
 lint: ## Lints the entire project
