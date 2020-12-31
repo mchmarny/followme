@@ -11,10 +11,6 @@ import (
 )
 
 var (
-	twKey    string
-	twSecret string
-	appPort  int = 8080
-
 	// Version is the app version set at build time.
 	Version string = "v0.0.1-default"
 )

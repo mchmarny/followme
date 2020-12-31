@@ -9,14 +9,14 @@ import (
 func TestPager(t *testing.T) {
 	list := []int64{0, 1, 2, 3, 4, 5, 6, 7}
 
-	t.Run("nil list", func(t *testing.T) {
-		_, err := GetInt64ArrayPager(nil, 10, 0)
-		assert.Error(t, err)
-	})
-
 	t.Run("page size", func(t *testing.T) {
 		_, err := GetInt64ArrayPager(list, 0, 0)
 		assert.Error(t, err)
+	})
+
+	t.Run("nil list", func(t *testing.T) {
+		_, err := GetInt64ArrayPager(nil, 10, 0)
+		assert.NoError(t, err)
 	})
 
 	t.Run("page larger than list", func(t *testing.T) {

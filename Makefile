@@ -11,9 +11,6 @@ tidy: ## Updates go modules and vendors deps
 
 .PHONY: test 
 test: tidy ## Tests the entire project 
-	TWITTER_KEY=$(TW_CONSUMER_KEY) \
-	TWITTER_SECRET=$(TW_CONSUMER_SECRET) \
-	RELEASE=$(RELEASE_VERSION) \
 	go test -count=1 -race -covermode=atomic -coverprofile=cover.out ./...
 
 .PHONY: build 
@@ -28,15 +25,11 @@ app: ## Runs compiled app
 worker: ## Runs compiled worker
 	bin/$(APP_NAME) worker -k $(TW_CONSUMER_KEY) -s $(TW_CONSUMER_SECRET)
 
-.PHONY: call 
-call: ## Runs pre-compiled app 
-	curl -i -X POST -H "content-type: application/json" -H "token: $(TEST_API_TOKEN)" \
-		 http://127.0.0.1:8080/api/v1.0/update
-
 .PHONY: spell 
 spell: ## Checks spelling across the entire project 
 	go get github.com/client9/misspell/cmd/misspell
-	misspell -locale US -error cmd/**/* build/**/* pkg/**/* tools/**/* web/**/* *.md
+	go mod tidy
+	misspell -locale US -error cmd/**/* build/**/* pkg/**/* tools/**/* web/**/* ./...
 
 .PHONY: lint 
 lint: ## Lints the entire project

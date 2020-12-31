@@ -1,0 +1,144 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*' # v0.8.1
+
+jobs:
+  build:
+    name: Build ${{ matrix.target_os }}_${{ matrix.target_arch }} binaries
+    runs-on: ${{ matrix.os }}
+    env:
+      GOVER: 1.15
+      GOLANG_CI_LINT_VER: v1.31
+      GOOS: ${{ matrix.target_os }}
+      GOARCH: ${{ matrix.target_arch }}
+      GOPROXY: https://proxy.golang.org
+      ARCHIVE_OUTDIR: dist/archives
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        target_arch: [arm, arm64, amd64]
+        include:
+          - os: ubuntu-latest
+            target_os: linux
+          - os: windows-latest
+            target_os: windows
+          - os: macOS-latest
+            target_os: darwin
+        exclude:
+          - os: windows-latest
+            target_arch: arm
+          - os: windows-latest
+            target_arch: arm64
+          - os: macOS-latest
+            target_arch: arm
+          - os: macOS-latest
+            target_arch: arm64
+    steps:
+
+    - name: Setup (Go ${{ env.GOVER }})
+      id: go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GOVER }}
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Cache
+      uses: actions/cache@preview
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-build-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.OS }}-build-${{ env.cache-name }}-
+          ${{ runner.OS }}-build-
+          ${{ runner.OS }}-
+
+    - name: Tidy
+      run: |
+        go mod tidy 
+        go mod vendor
+
+    - name: Lint
+      if: matrix.target_arch == 'amd64' && matrix.target_os == 'linux'
+      uses: golangci/golangci-lint-action@v2
+      with:
+        version: ${{ env.GOLANG_CI_LINT_VER }}
+        only-new-issues: true
+
+    - name: Test
+      env:
+        COVERAGE_OPTS: "-coverprofile=coverage.txt -covermode=atomic"
+      if: matrix.target_arch == 'amd64'
+      run: go test -v ./...
+
+    - name: Build
+      run: |
+        mkdir -p ${{ env.ARCHIVE_OUTDIR }}
+        env CGO_ENABLED=0 GOOS=${{ matrix.target_os }} GOARCH=${{ matrix.target_arch }} go build -ldflags "-X main.Version=$(echo ${GITHUB_REF:10})" -mod vendor -o ${{ env.ARCHIVE_OUTDIR }}/daprme-${{ matrix.target_os }} .
+
+    - name: Archive
+      uses: actions/upload-artifact@v2
+      with:
+        name: daprme-artifacts
+        path: ${{ env.ARCHIVE_OUTDIR }}
+
+  publish:
+    name: Publish
+    needs: build
+    env:
+      ARTIFACT_DIR: ./release
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: daprme-artifacts
+          path: ${{ env.ARTIFACT_DIR }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Automatically generated... notes are coming.
+          draft: false
+          prerelease: false
+
+      - name: Upload Mac Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ${{ env.ARTIFACT_DIR }}/daprme-darwin
+          asset_name: daprme
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ${{ env.ARTIFACT_DIR }}/daprme-linux
+          asset_name: daprme_linux
+          asset_content_type: application/octet-stream
+
+      - name: Upload Windows Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ${{ env.ARTIFACT_DIR }}/daprme-windows
+          asset_name: daprme.exe
+          asset_content_type: application/octet-stream

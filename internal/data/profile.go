@@ -2,8 +2,6 @@ package data
 
 import (
 	"time"
-
-	"github.com/mchmarny/followme/pkg/format"
 )
 
 // Profile represents simplified Twitter user profile
@@ -45,12 +43,4 @@ func (p *Profile) FormattedUpdatedAt() string {
 		return ""
 	}
 	return p.UpdatedAt.Format(time.RFC822)
-}
-
-// UserSince displays the length of time since the user joined Twitter s
-func (p *Profile) UserSince() string {
-	if p.CreatedAt.IsZero() {
-		return ""
-	}
-	return format.PrettyDurationSince(p.CreatedAt)
 }
