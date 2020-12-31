@@ -169,8 +169,8 @@ jobs:
           
       - name: Formula
         run: |
-          echo "release tag: ${RELEASE_TAG}"
-          echo "release sha: ${ASSET_SHA}"
+          echo "release tag: '${RELEASE_TAG}'"
+          echo "release sha: '${ASSET_SHA}'"
           sed -e "s/TAGVALUE/${RELEASE_TAG}/g" -e "s/SHAVALUE/${ASSET_SHA}/g" deployments/followme.tmpl > deployments/followme.rb
 
       - name: Commit
