@@ -50,15 +50,15 @@ function loadDay(listType, page) {
         $.each(data.events, function(rowIndex, e) {
             var row = $(`<tr class="user-data-row" data-user="${e.username}"/>`);
             row.append(`<td class="user-img">
-                    <a href="https://twitter.com/${e.username}" 
-                    title="${e.description} - (updated: ${e.updated_at})"
-                    target="_blank"><img src="${e.profile_image}" class="profile-image" />
+                    <a href="#" class="no-link" 
+                       title="${e.description} - (updated: ${e.updated_at})">
+                        <img src="${e.profile_image}" class="profile-image" />
                     </a>
                 </td>`);
             row.append(`<td class="user-name">
-                <a href="https://twitter.com/${e.username}" 
-                title="${e.description} - (updated: ${e.updated_at})" 
-                target="_blank">@${e.username}</a><div>${e.name}<br />${e.location}</div>
+                <a href="#" class="no-link" 
+                   title="${e.description} - (updated: ${e.updated_at})">
+                    @${e.username}</a><div>${e.name}<br />${e.location}</div>
                 </td>`);
             row.append(`<td class="user-data"><div>${e.has_relation}</div></td>`); 
             row.append(`<td class="user-data"><div>${e.friend_count}</div></td>`); 
@@ -66,6 +66,10 @@ function loadDay(listType, page) {
             row.append(`<td class="user-data"><div>${e.post_count}</div></td>`); 
             row.append(`<td class="user-data"><div>${e.listed_count}</div></td>`); 
             table.append(row);
+        });
+
+        $(".no-link").click(function(e){
+            e.preventDefault();
         });
 
         $(".user-data-row").on("mouseover", function() {
