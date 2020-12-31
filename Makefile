@@ -1,5 +1,5 @@
 APP_NAME         ?=followme
-APP_VERSION      ?=v0.2.1
+APP_VERSION      ?=v0.2.2
 
 .PHONY: all
 all: help
@@ -38,8 +38,8 @@ lint: ## Lints the entire project
 		
 .PHONY: tag 
 tag: ## Creates release tag 
-	git tag $(RELEASE_VERSION)
-	git push origin $(RELEASE_VERSION)
+	git tag $(APP_VERSION)
+	git push origin $(APP_VERSION)
 
 .PHONY: clean 
 clean: ## Cleans go and generated files
