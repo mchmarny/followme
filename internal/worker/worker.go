@@ -95,7 +95,7 @@ func (w *Worker) updateUser(ctx context.Context, forUser data.User) error {
 	today := time.Now().UTC()
 	yesterday := today.AddDate(0, 0, -1)
 
-	yesterdayState, err := w.getState(forUser.Username, yesterday)
+	yesterdayState, err := w.getState(forUser.Username, "Yesterday", yesterday)
 	if err != nil {
 		return errors.Wrap(err, "error getting yesterday's state")
 	}
@@ -103,7 +103,7 @@ func (w *Worker) updateUser(ctx context.Context, forUser data.User) error {
 	// ============================================================================
 	//  Today State
 	// ============================================================================
-	todayState, err := w.getState(forUser.Username, today)
+	todayState, err := w.getState(forUser.Username, "Today", today)
 	if err != nil {
 		return errors.Wrap(err, "error getting today's state")
 	}
@@ -112,25 +112,25 @@ func (w *Worker) updateUser(ctx context.Context, forUser data.User) error {
 	// New Followers
 	// ============================================================================
 	newFollowerIDs := list.GetDiff(yesterdayState.Followers, followerIDs)
-	w.logger.Printf("New Followers (y:%d, +:%d)", yesterdayState.FollowerCount, len(newFollowerIDs))
+	w.logger.Printf("New Followers    (y:%5d, t:+%5d)", yesterdayState.FollowerCount, len(newFollowerIDs))
 
 	// ============================================================================
 	// New Unfollowers
 	// ============================================================================
 	newUnfollowerIDs := list.GetDiff(followerIDs, yesterdayState.Followers)
-	w.logger.Printf("New Unfollowers (y:%d, -:%d)", yesterdayState.FollowerCount, len(newUnfollowerIDs))
+	w.logger.Printf("New Unfollowers  (y:%5d, t:-%5d)", yesterdayState.FollowerCount, len(newUnfollowerIDs))
 
 	// ============================================================================
 	// New Friends
 	// ============================================================================
 	newFriendsIDs := list.GetDiff(yesterdayState.Friends, friendIDs)
-	w.logger.Printf("New Friends (y:%d, +:%d)", yesterdayState.FriendsCount, len(newFriendsIDs))
+	w.logger.Printf("Newly Friended   (y:%5d, t:+%5d)", yesterdayState.FriendsCount, len(newFriendsIDs))
 
 	// ============================================================================
 	// New Unfriends
 	// ============================================================================
 	newUnfriendsIDs := list.GetDiff(friendIDs, yesterdayState.Friends)
-	w.logger.Printf("New Unfriends (y:%d, -:%d)", yesterdayState.FriendsCount, len(newUnfriendsIDs))
+	w.logger.Printf("Newly Unfriended (y:%5d, t:-%5d)", yesterdayState.FriendsCount, len(newUnfriendsIDs))
 
 	// ============================================================================
 	// Update State
@@ -155,16 +155,15 @@ func (w *Worker) updateUser(ctx context.Context, forUser data.User) error {
 	// ============================================================================
 	// Save State
 	// ============================================================================
-	w.logger.Printf("Saving updated state for %s", forUser.Username)
 	if err := w.db.Save(todayState); err != nil {
 		return errors.Wrap(err, "error saving daily state")
 	}
 
+	w.logger.Printf("Done processing state for: %s", forUser.Username)
 	return nil
-
 }
 
-func (w *Worker) getState(username string, date time.Time) (*data.DailyState, error) {
+func (w *Worker) getState(username, day string, date time.Time) (*data.DailyState, error) {
 	key := data.GetDailyStateKey(username, date)
 	ds := format.ToISODate(date)
 	var s data.DailyState
@@ -178,7 +177,8 @@ func (w *Worker) getState(username string, date time.Time) (*data.DailyState, er
 			StateOn:  ds,
 		}
 	}
-	w.logger.Printf("%s state (follower:%d, +%d, -%d, friend:%d, +%d, -%d)", ds,
+	w.logger.Printf("%-9s state (day:%s, follower:%d, +%5d, -%5d, friend:%5d, +%5d, -%5d)",
+		day, ds,
 		s.FollowerCount, s.NewFollowerCount, s.NewUnfollowerCount,
 		s.FriendsCount, s.NewFriendsCount, s.NewUnfriendedCount)
 	return &s, nil

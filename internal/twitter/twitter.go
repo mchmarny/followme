@@ -38,7 +38,7 @@ func (t *Twitter) getClient(ctx context.Context, byUser *data.User) (client *tw.
 
 // GetUserDetails retreaves details about the user
 func (t *Twitter) GetUserDetails(ctx context.Context, byUser *data.User) (user *data.Profile, err error) {
-	t.logger.Printf("User: %s", byUser.Username)
+	// t.logger.Printf("User: %s", byUser.Username)
 	users, err := t.getUsersByParams(ctx, byUser, &tw.UserLookupParams{
 		ScreenName:      []string{byUser.Username},
 		IncludeEntities: tw.Bool(true),
