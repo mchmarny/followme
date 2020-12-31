@@ -5,27 +5,30 @@ on:
 
 jobs:
 
-  build:
+  test:
     name: Test and Lint on Push
     runs-on: ubuntu-latest
+    env:
+      GO_VER: 1.15
+      LINT_VER: v1.34
     steps:
 
     - name: Setup
       id: go
       uses: actions/setup-go@v2
       with:
-        go-version: ^1.15
+        go-version: ${{ env.GO_VER }}
 
     - name: Checkout
       id: setup
       uses: actions/checkout@v2
 
-    # - uses: actions/cache@v2
-    #   with:
-    #     path: ~/go/pkg/mod
-    #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-go-
+    - uses: actions/cache@v2
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
 
     - name: Tidy
       run: |
@@ -39,8 +42,8 @@ jobs:
       uses: codecov/codecov-action@v1
       
     - name: Lint
-      uses: golangci/golangci-lint-action@v1
+      uses: golangci/golangci-lint-action@v2
       with:
-        version: v1.31
+        version: ${{ env.LINT_VER }}
       
     
