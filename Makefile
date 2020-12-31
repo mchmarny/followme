@@ -1,5 +1,5 @@
 APP_NAME         ?=followme
-APP_VERSION      ?=v0.2.2
+APP_VERSION      ?=v0.2.3
 
 .PHONY: all
 all: help
@@ -15,15 +15,17 @@ test: tidy ## Tests the entire project
 
 .PHONY: build 
 build: tidy ## Builds app locally (/bin)
-	go build -a -ldflags "-w -extldflags -static" -mod vendor -o bin/$(APP_NAME) ./cmd/
+	CGO_ENABLED=0 go build \
+	-ldflags "-X main.Version=$(APP_VERSION)" \
+	-mod vendor -o bin/$(APP_NAME) ./cmd/
 
 .PHONY: app 
 app: ## Runs compiled app
-	bin/$(APP_NAME) app -k $(TW_CONSUMER_KEY) -s $(TW_CONSUMER_SECRET) -p 8080
+	bin/$(APP_NAME) app
 
 .PHONY: worker 
 worker: ## Runs compiled worker
-	bin/$(APP_NAME) worker -k $(TW_CONSUMER_KEY) -s $(TW_CONSUMER_SECRET)
+	bin/$(APP_NAME) worker
 
 .PHONY: spell 
 spell: ## Checks spelling across the entire project 

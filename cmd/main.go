@@ -21,19 +21,28 @@ func main() {
 			Name:     "key",
 			Aliases:  []string{"k"},
 			Usage:    "Twitter API Key",
+			EnvVars:  []string{"TW_CONSUMER_KEY"},
 			Required: true,
 		},
 		&cli.StringFlag{
 			Name:     "secret",
 			Aliases:  []string{"s"},
 			Usage:    "Twitter API Secret",
+			EnvVars:  []string{"TW_CONSUMER_SECRET"},
 			Required: true,
 		},
 	}
 
 	appCmd := &cli.App{
-		Name:  "followme",
-		Usage: "run followme",
+		Name:        "followme",
+		Description: "Twitter follower monitoring utility",
+		Authors: []*cli.Author{
+			{
+				Name:  "Mark Chmarny",
+				Email: "followme@chmarny.com",
+			},
+		},
+		Version: Version,
 		Commands: []*cli.Command{
 			{
 				Name:  "app",
@@ -42,24 +51,23 @@ func main() {
 					flags[0],
 					flags[1],
 					&cli.IntFlag{
-						Name:    "port",
-						Aliases: []string{"p"},
-						Usage:   "app server port",
-						Value:   8080,
+						Name:        "port",
+						Aliases:     []string{"p"},
+						Usage:       "app server port",
+						Value:       8080,
+						DefaultText: "8080",
 					},
 					&cli.StringFlag{
-						Name:    "url",
-						Aliases: []string{"u"},
-						Usage:   "app server base URL",
-						Value:   "http://127.0.0.1",
+						Name:        "url",
+						Aliases:     []string{"u"},
+						Usage:       "app server base URL",
+						Value:       "http://127.0.0.1",
+						DefaultText: "http://127.0.0.1",
 					},
 				},
 				Action: func(c *cli.Context) error {
-					a, err := app.NewApp(c.String("key"),
-						c.String("secret"),
-						c.String("url"),
-						Version,
-						c.Int("port"))
+					a, err := app.NewApp(c.String("key"), c.String("secret"),
+						c.String("url"), Version, c.Int("port"))
 					if err != nil {
 						return errors.Wrap(err, "error creating new app service")
 					}
@@ -71,10 +79,8 @@ func main() {
 				Usage: "run worker",
 				Flags: flags,
 				Action: func(c *cli.Context) error {
-					w, err := worker.NewWorker(c.String("key"),
-						c.String("secret"),
-						c.String("url"),
-						Version)
+					w, err := worker.NewWorker(c.String("key"), c.String("secret"),
+						c.String("url"), Version)
 					if err != nil {
 						return errors.Wrap(err, "error creating new worker service")
 					}
