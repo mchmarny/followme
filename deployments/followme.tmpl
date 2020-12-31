@@ -1,0 +1,15 @@
+class Daprme < Formula
+  desc "Utility to monitor Twitter followers"
+  homepage "https://thingz.io"
+  url "https://github.com/mchmarny/followme/releases/download/TAGVALUE/followme"
+  sha256 "SHAVALUE"
+  license "MIT"
+
+  def install
+    bin.install "followme" => "followme"
+  end
+
+  test do
+    system "#{bin}/followme", "--version"
+  end
+end
