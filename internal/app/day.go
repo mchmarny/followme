@@ -39,7 +39,7 @@ func (a *App) dayHandler(c *gin.Context) {
 	data := gin.H{
 		"user":      profile,
 		"version":   a.appVersion,
-		"date":      isoDate,
+		"days":      isoDate,
 		"listTypes": listTypes,
 	}
 

@@ -12,7 +12,7 @@
 
     <div id="meta-panel">
         <form>
-            <input type="hidden" name="selectedDate" id="selectedDate" value="{{ .date }}" />
+            <input type="hidden" name="selectedDate" id="selectedDate" value="{{ .days }}" />
             List: 
             <select id="list-selector">
                 {{ range $key, $value := .listTypes }}

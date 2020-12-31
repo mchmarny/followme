@@ -12,20 +12,21 @@ $(function () {
 
     if ($("#list-selector").length) {
         $("#list-selector").change(function(){
-            loadDay($("#selectedDate").val(), $(this).val(), 1); // on change
+            loadDay($(this).val(), 1); // on change
         });
         $("#day-list-prev, #day-list-next").click(function(e){
             e.preventDefault();
-            loadDay($("#selectedDate").val(), $("#list-selector").val(), $(this).data("page")); // on click
+            loadDay($("#list-selector").val(), $(this).data("page")); // on click
         });
 
-        loadDay($("#selectedDate").val(), $("#list-selector").val(), 1); // on load
+        loadDay($("#list-selector").val(), 1); // on load
     };
 });
 
-function loadDay(selectedDate, listType, page) {
+function loadDay(listType, page) {
     $(".after-load").hide();
-    var table = $("#events-table tbody")
+    var selectedDate = $("#selectedDate").val();
+    var table = $("#events-table tbody");
     table.empty();
     queryURL = "/data/day/" + selectedDate + "/list/" + listType + "/page/" + page;
     console.log("Query URL: " + queryURL);

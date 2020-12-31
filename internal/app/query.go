@@ -144,9 +144,10 @@ func (a *App) dayQueryHandler(c *gin.Context) {
 		a.errJSONAndAbort(c, errors.New("list type required"))
 		return
 	}
+	a.logger.Printf("day:%s, list:%s, page:%d", isoDate, listType, pageNum)
 
 	var state data.DailyState
-	stateKey := data.GetDailyStateKey(forUser.Username, time.Now().UTC())
+	stateKey := data.GetDailyStateKeyISO(forUser.Username, isoDate)
 	if err := a.db.One("Key", stateKey, &state); err != nil {
 		a.errJSONAndAbort(c, errors.Wrapf(err, "error getting user state for %s", stateKey))
 		return
@@ -186,50 +187,51 @@ func (a *App) dayQueryHandler(c *gin.Context) {
 	}
 
 	var events []*data.UserEvent
-
+	a.logger.Printf("all IDs:%d, page size:%d, page num:%d", len(ids), a.pageSize, pageNum)
 	idPager, err := pager.GetInt64ArrayPager(ids, a.pageSize, pageNum)
 	if err != nil {
 		a.errJSONAndAbort(c, errors.Wrapf(err, "error creating pager for %d items, page size:%d, page num:%d", len(ids), a.pageSize, pageNum))
 		return
 	}
 
-	if len(ids) > 0 {
-		users, err := a.twClient.GetUserDetailsFromIDs(ctx, forUser, idPager.Next())
+	users, err := a.twClient.GetUserDetailsFromIDs(ctx, forUser, idPager.Next())
+	if err != nil {
+		a.errJSONAndAbort(c, errors.Wrap(err, "error getting user details"))
+		return
+	}
+
+	a.logger.Printf("users:%d", len(users))
+	for _, u := range users {
+		event := &data.UserEvent{
+			Profile:   u,
+			EventDate: isoDate,
+			EventType: eventType,
+			EventUser: forUser.Username,
+		}
+
+		rel, err := a.twClient.GetRelationship(ctx, forUser, profile.ID, u.ID)
 		if err != nil {
-			a.errJSONAndAbort(c, errors.Wrap(err, "error getting user details"))
+			a.errJSONAndAbort(c, errors.Wrap(err, "error getting user relationship"))
 			return
 		}
 
-		for _, u := range users {
-			event := &data.UserEvent{
-				Profile:   u,
-				EventDate: isoDate,
-				EventType: eventType,
-				EventUser: forUser.Username,
-			}
+		if eventType == data.FollowedEventType || eventType == data.UnfollowedEventType {
+			event.HasRelationship = format.ToYesNo(rel.Source.Following)
+		} else {
+			event.HasRelationship = format.ToYesNo(rel.Target.Following)
+		}
 
-			rel, err := a.twClient.GetRelationship(ctx, forUser, profile.ID, u.ID)
-			if err != nil {
-				a.errJSONAndAbort(c, errors.Wrap(err, "error getting user relationship"))
-				return
-			}
+		events = append(events, event)
+	} // end for users
 
-			if eventType == data.FollowedEventType || eventType == data.UnfollowedEventType {
-				event.HasRelationship = format.ToYesNo(rel.Source.Following)
-			} else {
-				event.HasRelationship = format.ToYesNo(rel.Target.Following)
-			}
-
-			events = append(events, event)
-		} // end for users
-	} // end if len(ids) > 0
+	a.logger.Printf("events:%d", len(events))
 
 	c.JSON(http.StatusOK, gin.H{
 		"user":       profile,
 		"state":      state,
 		"version":    a.appVersion,
 		"updated_on": forUser.UpdatedAt,
-		"date":       isoDate,
+		"days":       isoDate,
 		"events":     events,
 		"listTyep":   listType,
 		"pageNum":    pageNum,

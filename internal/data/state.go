@@ -36,7 +36,12 @@ type DailyState struct {
 	NewUnfriendedCount int     `json:"new_unfriended_count"`
 }
 
-// GetDailyStateKey parses db key using username and date
+// GetDailyStateKey returns state key for a date
 func GetDailyStateKey(username string, date time.Time) string {
 	return fmt.Sprintf("%s-%s", format.NormalizeString(username), format.ToISODate(date))
+}
+
+// GetDailyStateKeyISO returns state key for an ISO date
+func GetDailyStateKeyISO(username, isoDate string) string {
+	return fmt.Sprintf("%s-%s", format.NormalizeString(username), isoDate)
 }
