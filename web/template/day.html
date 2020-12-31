@@ -6,7 +6,7 @@
 
 <div id="middle-section">
 
-    <h3>Daily events for {{ .date }}</h3>
+    <h3>Daily events for {{ .days }}</h3>
 
     <div class="error-msg"></div>
 
@@ -23,7 +23,7 @@
     </div>
 
     <!-- Table -->
-    <div class="list-table-wrapper"  class="after-load">
+    <div class="list-table-wrapper" class="after-load">
         <table class="list-table" id="events-table">
             <thead>
                 <tr>
@@ -43,7 +43,8 @@
     </div>
 
     <div class="page-nav">
-        <a href="#" id="day-list-prev" data-page="0">Prev</a> | <a href="#" id="day-list-next" data-page="2">Next</a>
+        <a href="#" id="day-list-prev" class="after-load page-button" data-page="0">Prev</a> 
+        <a href="#" id="day-list-next" class="after-load page-button" data-page="2">Next</a>
     </div>
 
 </div>

@@ -63,7 +63,9 @@ func (t *Twitter) GetUserDetailsFromIDs(ctx context.Context, byUser *data.User, 
 	if ids == nil {
 		return nil, errors.Wrap(err, "ids required")
 	}
-	// logger.Printf("getting twitter profiles for %d ids", len(ids))
+
+	// t.logger.Printf("getting twitter profiles for %d ids", len(ids))
+
 	p, err := pager.GetInt64ArrayPager(ids, 100, 0)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating pager")
@@ -71,10 +73,9 @@ func (t *Twitter) GetUserDetailsFromIDs(ctx context.Context, byUser *data.User, 
 	for {
 		list := p.Next()
 		if list == nil {
-			t.logger.Println("pager done")
 			return
 		}
-		// logger.Printf("twitter profile request page: %d", len(list))
+		// t.logger.Printf("twitter profile request page: %d", len(list))
 		u, err := t.getUsersByParams(ctx, byUser, &tw.UserLookupParams{
 			UserID:          list,
 			IncludeEntities: tw.Bool(true),
@@ -84,7 +85,7 @@ func (t *Twitter) GetUserDetailsFromIDs(ctx context.Context, byUser *data.User, 
 			return nil, errors.Wrap(err, "error getting users")
 		}
 
-		// logger.Printf("twitter profile result page: %d", len(u))
+		// t.logger.Printf("twitter profile result page: %d", len(u))
 		users = append(users, u...)
 	}
 }

@@ -93,14 +93,14 @@ func (a *App) dashboardQueryHandler(c *gin.Context) {
 		totalAvg += float32(dayState.FollowerCount)
 		series.AvgTotal[dayState.StateOn] = totalAvg / float32(day)
 
-		a.logger.Printf("day[%d] +:%d -%d a:%f ra:%f f+:%d f-:%d",
-			day,
-			dayState.NewFollowerCount,
-			dayState.NewUnfollowerCount,
-			runSum,
-			series.AvgFollowers[dayState.StateOn],
-			dayState.NewFriendsCount,
-			dayState.NewUnfriendedCount)
+		// a.logger.Printf("day[%d] +:%d -%d a:%f ra:%f f+:%d f-:%d",
+		// 	day,
+		// 	dayState.NewFollowerCount,
+		// 	dayState.NewUnfollowerCount,
+		// 	runSum,
+		// 	series.AvgFollowers[dayState.StateOn],
+		// 	dayState.NewFriendsCount,
+		// 	dayState.NewUnfriendedCount)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -124,13 +124,16 @@ func (a *App) dayQueryHandler(c *gin.Context) {
 	pageNum := 0
 	pageStr := c.Param("page")
 	if pageStr == "" {
-		pageStr = "1"
+		pageStr = "0"
 	}
 	var pageErr error
 	pageNum, pageErr = strconv.Atoi(pageStr)
 	if pageErr != nil {
 		a.errJSONAndAbort(c, errors.Wrap(pageErr, "error parsing page number"))
 		return
+	}
+	if pageNum < 0 {
+		pageNum = 0
 	}
 
 	isoDate := c.Param("day")
@@ -144,7 +147,8 @@ func (a *App) dayQueryHandler(c *gin.Context) {
 		a.errJSONAndAbort(c, errors.New("list type required"))
 		return
 	}
-	a.logger.Printf("day:%s, list:%s, page:%d", isoDate, listType, pageNum)
+
+	// a.logger.Printf("day:%s, list:%s, page:%d", isoDate, listType, pageNum)
 
 	var state data.DailyState
 	stateKey := data.GetDailyStateKeyISO(forUser.Username, isoDate)
@@ -186,11 +190,13 @@ func (a *App) dayQueryHandler(c *gin.Context) {
 		return
 	}
 
-	var events []*data.UserEvent
-	a.logger.Printf("all IDs:%d, page size:%d, page num:%d", len(ids), a.pageSize, pageNum)
+	// a.logger.Printf("all IDs:%d, page size:%d, page num:%d", len(ids), a.pageSize, pageNum)
+
 	idPager, err := pager.GetInt64ArrayPager(ids, a.pageSize, pageNum)
 	if err != nil {
-		a.errJSONAndAbort(c, errors.Wrapf(err, "error creating pager for %d items, page size:%d, page num:%d", len(ids), a.pageSize, pageNum))
+		a.errJSONAndAbort(c, errors.Wrapf(err,
+			"error creating pager for %d items, page size:%d, page num:%d",
+			len(ids), a.pageSize, pageNum))
 		return
 	}
 
@@ -200,7 +206,9 @@ func (a *App) dayQueryHandler(c *gin.Context) {
 		return
 	}
 
-	a.logger.Printf("users:%d", len(users))
+	// a.logger.Printf("users:%d", len(users))
+
+	var events []*data.UserEvent
 	for _, u := range users {
 		event := &data.UserEvent{
 			Profile:   u,
@@ -224,7 +232,7 @@ func (a *App) dayQueryHandler(c *gin.Context) {
 		events = append(events, event)
 	} // end for users
 
-	a.logger.Printf("events:%d", len(events))
+	//a.logger.Printf("events:%d", len(events))
 
 	c.JSON(http.StatusOK, gin.H{
 		"user":       profile,

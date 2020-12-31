@@ -11,7 +11,7 @@ import (
 func (a *App) defaultHandler(c *gin.Context) {
 	uid, _ := c.Cookie(userIDCookieName)
 	if uid != "" {
-		a.logger.Printf("user already authenticated -> view")
+		// a.logger.Printf("user already authenticated -> view")
 		c.Redirect(http.StatusSeeOther, "/view/dash")
 		return
 	}

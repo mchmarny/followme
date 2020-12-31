@@ -336,6 +336,19 @@ h3 {
 	margin: 4px 2px;
   }
 
+.page-button {
+	background-color: #1DA1F2;
+	border: none;
+	border-radius: 2px;
+	color: white;
+	padding: 5px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 1em;
+	margin: 2px 1px;
+}
+
 #profile-column-left {
 	width: 250px;
 	height: auto;

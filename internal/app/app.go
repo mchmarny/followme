@@ -45,25 +45,31 @@ func NewApp(key, secret, url, version string, port int) (*App, error) {
 	}
 
 	return &App{
-		db:          db,
-		twClient:    t,
-		authService: as,
-		logger:      logger,
-		appVersion:  version,
-		hostPort:    fmt.Sprintf("0.0.0.0:%d", port),
-		pageSize:    10, // TODO: parameterize
+		db:                 db,
+		twClient:           t,
+		authService:        as,
+		logger:             logger,
+		appVersion:         version,
+		hostPort:           fmt.Sprintf("0.0.0.0:%d", port),
+		pageSize:           10,                // TODO: parameterize
+		userCookieDuration: 60 * 60 * 24 * 30, // month in sec
+		maxSessionAge:      5.0,               // min
+		sessionCookieAge:   5 * 60,            // maxSessionAge in secs
 	}, nil
 }
 
 // App represents the app
 type App struct {
-	db          *storm.DB
-	twClient    *twitter.Twitter
-	logger      *log.Logger
-	authService *oauth1a.Service
-	hostPort    string
-	appVersion  string
-	pageSize    int
+	db                 *storm.DB
+	twClient           *twitter.Twitter
+	logger             *log.Logger
+	authService        *oauth1a.Service
+	hostPort           string
+	appVersion         string
+	pageSize           int
+	userCookieDuration int
+	maxSessionAge      float64
+	sessionCookieAge   int
 }
 
 // Run starts the app and blocks while running.
@@ -74,7 +80,7 @@ func (a *App) Run() error {
 	defer a.db.Close()
 
 	// router
-	r := gin.Default()
+	r := gin.New()
 	r.Use(gin.Recovery())
 
 	// static

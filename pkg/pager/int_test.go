@@ -107,4 +107,18 @@ func TestPager(t *testing.T) {
 		assert.Equal(t, int64(7), n[1])
 		assert.False(t, p.HasNext())
 	})
+
+	t.Run("one item", func(t *testing.T) {
+		list := []int64{1}
+		p, err := GetInt64ArrayPager(list, 10, 0)
+		assert.NoError(t, err)
+		assert.NotNil(t, p)
+		assert.False(t, p.HasPrev())
+		assert.True(t, p.HasNext())
+		n := p.Next()
+		assert.Equal(t, 1, len(n))
+		assert.Equal(t, int64(1), n[0])
+		assert.False(t, p.HasPrev())
+		assert.False(t, p.HasNext())
+	})
 }

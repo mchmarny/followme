@@ -6,20 +6,16 @@ $(function () {
         });
     };
 
-    $(".user-data-row").click(function(){
-        window.open("https://twitter.com/" + $(this).data('user'), "_blank");
-    });
-
     if ($("#list-selector").length) {
         $("#list-selector").change(function(){
-            loadDay($(this).val(), 1); // on change
+            loadDay($(this).val(), 0); // on change
         });
         $("#day-list-prev, #day-list-next").click(function(e){
             e.preventDefault();
             loadDay($("#list-selector").val(), $(this).data("page")); // on click
         });
 
-        loadDay($("#list-selector").val(), 1); // on load
+        loadDay($("#list-selector").val(), 0); // on load
     };
 });
 
@@ -33,8 +29,23 @@ function loadDay(listType, page) {
     $.get(queryURL, function (data) {
         console.log(data);
 
-        $("#day-list-prev").data("page", data.pagePrev);
-        $("#day-list-next").data("page", data.pageNext);
+        var prevLink = $("#day-list-prev");
+        var nextLink = $("#day-list-next");
+
+        prevLink.data("page", data.pagePrev);
+        nextLink.data("page", data.pageNext);
+
+        if (data.hasPrev) {
+            prevLink.show();
+        }else{
+            prevLink.hide();
+        }
+
+        if (data.hasNext) {
+            nextLink.show();
+        }else{
+            nextLink.hide();
+        }
         
         $.each(data.events, function(rowIndex, e) {
             var row = $(`<tr class="user-data-row" data-user="${e.username}"/>`);
@@ -65,6 +76,10 @@ function loadDay(listType, page) {
         $(".user-data-row").on("mouseout", function() {
             $(this).closest("tr").removeClass("highlight");
             $(this).closest("table").find(".user-data-row:nth-child(" + ($(this).index() + 1) + ")").removeClass("highlight");
+        });
+
+        $(".user-data-row").click(function(){
+            window.open("https://twitter.com/" + $(this).data('user'), "_blank");
         });
     
     }).fail(function(err) {

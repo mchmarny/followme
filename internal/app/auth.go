@@ -21,12 +21,6 @@ const (
 	authIDCookieName = "auth_id"
 )
 
-var (
-	userCookieDuration = 60 * 60 * 24 * 30 // month in sec
-	maxSessionAge      = 5.0               // min
-	sessionCookieAge   = 5 * 60            // maxSessionAge in secs
-)
-
 // AuthSession represents the authenticated user session
 type AuthSession struct {
 	ID     string    `storm:"id" json:"id"`
@@ -64,7 +58,7 @@ func (a *App) authLoginHandler(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie(authIDCookieName, authSession.ID, sessionCookieAge, "/", c.Request.Host, false, true)
+	c.SetCookie(authIDCookieName, authSession.ID, a.sessionCookieAge, "/", c.Request.Host, false, true)
 	c.Redirect(http.StatusFound, AuthURL)
 }
 
@@ -83,8 +77,8 @@ func (a *App) authCallbackHandler(c *gin.Context) {
 	}
 
 	sessionAge := time.Now().UTC().Sub(authSession.On)
-	if sessionAge.Minutes() > maxSessionAge {
-		a.viewErrorHandler(c, http.StatusUnauthorized, err, fmt.Sprintf("session %s expired. Age %v, expected %f min", sessionAge, maxSessionAge, maxSessionAge))
+	if sessionAge.Minutes() > a.maxSessionAge {
+		a.viewErrorHandler(c, http.StatusUnauthorized, err, fmt.Sprintf("session %s expired. Age %v, expected %f min", sessionAge, a.maxSessionAge, a.maxSessionAge))
 		return
 	}
 
@@ -136,7 +130,7 @@ func (a *App) authCallbackHandler(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie(userIDCookieName, u.Username, userCookieDuration, "/", c.Request.Host, false, true)
+	c.SetCookie(userIDCookieName, u.Username, a.userCookieDuration, "/", c.Request.Host, false, true)
 	c.Redirect(http.StatusSeeOther, "/view/dash")
 }
 
