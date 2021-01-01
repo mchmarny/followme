@@ -37,6 +37,7 @@ To use followme you will need Twitter API credentials (consumer key and secret):
 2. Enter your app name and click the create button
 3. Copy the API key and API secret key
 4. Go to App Settings click the Edit in Authentication setting section
+5. Enable Enable 3-legged OAuth
 6. Enter `http://127.0.0.1:8080/auth/callback` in the Callback URLs section
 7. Click save to complete the app configuration
 
