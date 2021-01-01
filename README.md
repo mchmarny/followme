@@ -33,26 +33,27 @@ Download [latest release](https://github.com/mchmarny/followme/releases/latest) 
 
 To use followme you will need Twitter API credentials (consumer key and secret):
 
-1. Navigate to https://dev.twitter.com/apps/new and log in
-2. Enter your app name (`followme` or similar) and description (leave URL empty)
-3. Accept the TOS, and solve the CAPTCHA.
-4. Submit the form by clicking the Create your Twitter Application
-5. Copy the consumer key and consumer secret to use with followme app and worker
+1. Navigate to https://developer.twitter.com/en/portal/apps/new and log in
+2. Enter your app name and click the create button
+3. Copy the API key and API secret key
+4. Go to App Settings click the Edit in Authentication setting section
+6. Enter `http://127.0.0.1:8080/auth/callback` in the Callback URLs section
+7. Click save to complete the app configuration
 
 ## Usage
 
-> For both the follow me app and worker you can either provide the `--key` and `--secret` flags on each launch, or define the `TWITTER_CONSUMER_KEY` and `TWITTER_CONSUMER_SECRET` variables
+> For both the follow me app and worker you can either provide the `--key` and `--secret` flags on each launch, or define the `TWITTER_CONSUMER_KEY` and `TWITTER_CONSUMER_SECRET` variables.
 
 ### App
 
 The followme app displays your Twitter follower data.
 
 ```shell
-followme app --key $YOUR_TWITTER_CONSUMER_KEY \
-             --secret $TWITTER_CONSUMER_SECRET
+followme app --key <your-api-key> \
+             --secret <your-consumer-key>
 ```
 
-> List all flags supported by followme using `followme` without any arguments
+> You can list all supported flags by executing `followme` without any arguments.
 
 The above command will launch followme app in your browser.
 
@@ -61,8 +62,8 @@ The above command will launch followme app in your browser.
 The followme worker updates your Twitter follower data. You can run it 1-2 times a day using cron.
 
 ```shell
-followme worker --key $YOUR_TWITTER_CONSUMER_KEY \
-                --secret $TWITTER_CONSUMER_SECRET
+followme worker --key <your-api-key> \
+                --secret <your-consumer-key>
 ```
 
 ## Disclaimer
