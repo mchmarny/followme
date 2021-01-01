@@ -77,7 +77,7 @@ jobs:
         mkdir -p ${{ env.OUT_DIR }}
         env CGO_ENABLED=0 GOOS=${{ matrix.target_os }} GOARCH=${{ matrix.target_arch }} go build -ldflags "-X main.Version=$(echo ${GITHUB_REF:10})" -mod vendor -o followme-${{ matrix.target_os }}-${{ matrix.target_arch }} ./cmd/
         chmod +x followme-${{ matrix.target_os }}-${{ matrix.target_arch }}
-        tar czf "${{ env.OUT_DIR }}/followme-${{ matrix.target_os }}-${{ matrix.target_arch }}" followme-${{ matrix.target_os }}-${{ matrix.target_arch }}
+        tar czf ${{ env.OUT_DIR }}/followme-${{ matrix.target_os }}-${{ matrix.target_arch }}.tar.gz followme-${{ matrix.target_os }}-${{ matrix.target_arch }}
 
     - name: Archive
       uses: actions/upload-artifact@v2
@@ -118,7 +118,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ${{ env.ARTIFACT_DIR }}/followme-darwin-amd64
+          asset_path: ${{ env.ARTIFACT_DIR }}/followme-darwin-amd64.tar.gz
           asset_name: followme-darwin-amd64.tar.gz
           asset_content_type: application/octet-stream
 
@@ -128,7 +128,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ${{ env.ARTIFACT_DIR }}/followme-linux-amd64
+          asset_path: ${{ env.ARTIFACT_DIR }}/followme-linux-amd64.tar.gz
           asset_name: followme-linux-amd64.tar.gz
           asset_content_type: application/octet-stream
 
@@ -138,19 +138,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ${{ env.ARTIFACT_DIR }}/followme-windows-amd64
+          asset_path: ${{ env.ARTIFACT_DIR }}/followme-windows-amd64.tar.gz
           asset_name: followme-windows-amd64.tar.gz
           asset_content_type: application/octet-stream
-
-
-      # - name: Homebrew formula bump
-      #   uses: dawidd6/action-homebrew-bump-formula@v3.5.1
-      #   with:
-      #     token: ${{ secrets.OPS_TOKEN }}
-      #     tap: mchmarny/homebrew-followme
-      #     base-branch: main
-      #     formula: followme
-      #     tag: ${{github.ref}}
-      #     revision: ${{github.sha}}
-      #     download-url: https://example.com/foo/v0.1.tar.gz
-      #     force: true
