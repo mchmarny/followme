@@ -1,19 +1,11 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mchmarny/followme/internal/data"
-)
-
-var (
-	listTypes = map[string]string{
-		data.FollowedEventType:   "Who followed me",
-		data.UnfollowedEventType: "Who unfollowed me",
-		data.FriendedEventType:   "Whom I friended",
-		data.UnfriendedEventType: "Whom I unfriended",
-	}
 )
 
 func (a *App) dayHandler(c *gin.Context) {
@@ -28,6 +20,20 @@ func (a *App) dayHandler(c *gin.Context) {
 	if isoDate == "" {
 		a.viewErrorHandler(c, http.StatusBadRequest, nil, "Day required (param: day)")
 		return
+	}
+
+	var state data.DailyState
+	stateKey := data.GetDailyStateKeyISO(forUser.Username, isoDate)
+	if err := a.db.One("Key", stateKey, &state); err != nil {
+		a.viewErrorHandler(c, http.StatusBadRequest, err, "error getting user state")
+		return
+	}
+
+	listTypes := map[string]string{
+		data.FollowedEventType:   fmt.Sprintf("Who followed me (%d)", state.NewFollowerCount),
+		data.UnfollowedEventType: fmt.Sprintf("Who unfollowed me (%d)", state.NewUnfollowerCount),
+		data.FriendedEventType:   fmt.Sprintf("Whom I friended (%d)", state.NewFriendsCount),
+		data.UnfriendedEventType: fmt.Sprintf("Whom I unfriended (%d)", state.NewUnfriendedCount),
 	}
 
 	var profile data.Profile
