@@ -43,7 +43,7 @@ func main() {
 
 	appCmd := &cli.App{
 		Name:        "followme",
-		Description: "Twitter follower monitoring utility",
+		Description: "Chart and monitor Twitter followers and unfollowers across multiple accounts.",
 		Authors: []*cli.Author{
 			{
 				Name:  "Mark Chmarny",

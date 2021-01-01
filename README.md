@@ -1,12 +1,12 @@
 # followme
 
-Monitor new daily Twitter followers/unfollowers across multiple accounts. Identify who doesn't follow you back and whom you don't follow back without handing over your entire Twitter account over to another on-line service.
+App to chart and monitor Twitter followers/unfollowers across multiple accounts. Provides simple reports to identify who followed you each day, who doesn't follow you back, and whom you don't follow back. 
 
-## Why app vs service
+## Why app vs on-line service
 
 While there are many services available to track your followers and unfollowers on-line, they all tend to require a full access to your Twitter account, including the ability to make changes to your profile, and tweet, like, or DM on your behalf. 
 
-The followme app requires only read-only level access to your Twitter account, and uses only data already available publicly, and keeps your data stored locally, on your device.
+followme requires only read-level access to your Twitter account and uses only data that's already available publicly to anyone on Twitter. followme also and keeps your data stored locally, on your device.
 
 ## Install
 
@@ -25,7 +25,7 @@ Subsequent releases will be automatically picked up with `brew upgrade`.
 
 ### Windows 
 
-> The choco package for followme is in works, stay tuned. For now install manually.
+> The choco package in works. For now install manually.
 
 Download [latest release](https://github.com/mchmarny/followme/releases/latest) and place it in your path.
 
