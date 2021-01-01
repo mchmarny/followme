@@ -41,6 +41,8 @@ To use followme you will need Twitter API credentials (consumer key and secret):
 6. Enter `http://127.0.0.1:8080/auth/callback` in the Callback URLs section
 7. Click save to complete the app configuration
 
+After Twitter API setup, run the `followme app` first to login and complete the OAuth setting and then the `followme worker` to download data.
+
 ## Usage
 
 > For both the follow me app and worker you can either provide the `--key` and `--secret` flags on each launch, or define the `TWITTER_CONSUMER_KEY` and `TWITTER_CONSUMER_SECRET` variables.
