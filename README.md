@@ -8,6 +8,23 @@ While there are a few services available on-line to track your followers and unf
 
 followme app requires only read-only access to your Twitter account, uses only public data already available about your account, and keeps your data locally, on your device. 
 
+## Install
+
+### Mac or Linux 
+
+Install followme with Homebrew:
+
+```shell
+brew tap mchmarny/followme
+brew install followme
+```
+
+Subsequent releases will be automatically picked up with `brew upgrade`.
+
+### Windows 
+
+Download [latest release](https://github.com/mchmarny/followme/releases/latest) and place it in your path.
+
 ## Setup 
 
 To use followme you will need Twitter consumer key (API key) and consumer secret:
@@ -41,22 +58,6 @@ followme worker --key $YOUR_TWITTER_CONSUMER_KEY \
                 --secret $TWITTER_CONSUMER_SECRET
 ```
 
-## Install
-
-### Mac or Linux 
-
-Install followme with Homebrew
-
-```shell
-brew tap mchmarny/followme
-brew install followme
-```
-
-New release will be automatically picked up with `brew upgrade`
-
-### Windows 
-
-Download [latest release](https://github.com/mchmarny/followme/releases/latest) and place it in your path.
 
 ## Disclaimer
 
