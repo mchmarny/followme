@@ -1,5 +1,5 @@
 APP_NAME         ?=followme
-APP_VERSION      ?=v0.2.15
+APP_VERSION      ?=v0.2.16
 
 .PHONY: all
 all: help
