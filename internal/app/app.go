@@ -7,7 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"path"
+	"syscall"
 	"time"
 
 	"github.com/asdine/storm/v3"
@@ -15,6 +17,7 @@ import (
 	"github.com/kurrik/oauth1a"
 	"github.com/mchmarny/followme/internal/data"
 	"github.com/mchmarny/followme/internal/twitter"
+	"github.com/mchmarny/followme/pkg/url"
 	"github.com/pkg/errors"
 )
 
@@ -25,7 +28,7 @@ func NewApp(key, secret, url, version string, port int) (*App, error) {
 	}
 
 	// log
-	logger := log.New(os.Stdout, "app: ", 0)
+	logger := log.New(os.Stdout, "", 0)
 
 	// data
 	db, err := data.GetDB()
@@ -60,6 +63,7 @@ func NewApp(key, secret, url, version string, port int) (*App, error) {
 		userCookieDuration: 60 * 60 * 24 * 30, // month in sec
 		maxSessionAge:      5.0,               // min
 		sessionCookieAge:   5 * 60,            // maxSessionAge in secs
+		appURL:             fmt.Sprintf("%s:%d", url, port),
 	}, nil
 }
 
@@ -75,6 +79,7 @@ type App struct {
 	userCookieDuration int
 	maxSessionAge      float64
 	sessionCookieAge   int
+	appURL             string
 }
 
 // Run starts the app and blocks while running.
@@ -135,12 +140,34 @@ func (a *App) Run() error {
 		data.GET("/day/:day/list/:list/page/:page", a.dayQueryHandler)
 	}
 
-	// port
-	a.logger.Printf("App starting: %s \n", a.hostPort)
-	if err := r.Run(a.hostPort); err != nil {
-		return errors.Wrap(err, "error while running app server")
+	// signals
+	done := make(chan os.Signal, 1)
+	serverErr := make(chan error, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	// start
+	go func() {
+		a.logger.Printf("Listening: %s \n", a.hostPort)
+		if err := r.Run(a.hostPort); err != nil {
+			serverErr <- errors.Wrap(err, "error while running app server")
+		}
+	}()
+
+	time.Sleep(2 * time.Second)
+	a.logger.Printf("Opening: %s", a.appURL)
+	if err := url.Open(a.appURL); err != nil {
+		return errors.Wrap(err, "error opening URL")
 	}
-	return nil
+
+	for {
+		select {
+		case sig := <-done:
+			a.logger.Printf("\nClosing: %v", sig)
+			return nil
+		case err := <-serverErr:
+			return err
+		}
+	}
 }
 
 func (a *App) setTemplates(r *gin.Engine) error {
