@@ -21,14 +21,14 @@ func main() {
 			Name:     "key",
 			Aliases:  []string{"k"},
 			Usage:    "Twitter API Key",
-			EnvVars:  []string{"TW_CONSUMER_KEY"},
+			EnvVars:  []string{"TWITTER_CONSUMER_KEY"},
 			Required: true,
 		},
 		&cli.StringFlag{
 			Name:     "secret",
 			Aliases:  []string{"s"},
 			Usage:    "Twitter API Secret",
-			EnvVars:  []string{"TW_CONSUMER_SECRET"},
+			EnvVars:  []string{"TWITTER_CONSUMER_SECRET"},
 			Required: true,
 		},
 	}

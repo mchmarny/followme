@@ -10,9 +10,43 @@ followme app requires only read-only access to your Twitter account, uses only p
 
 ## Usage
 
+> For both app and the worker you can either provide the `--key` and `--secret` flags of define the `TWITTER_CONSUMER_KEY` and `TWITTER_CONSUMER_SECRET` variables
 
+### App
+
+The followme app displays your Twitter follower data.
+
+```shell
+followme app --key $YOUR_TWITTER_CONSUMER_KEY \
+             --secret $TWITTER_CONSUMER_SECRET \
+             --port 8080
+```
+
+### Worker 
+
+The followme worker updates your Twitter follower data. You can run it 1-2 times a day using cron.
+
+```shell
+followme worker --key $YOUR_TWITTER_CONSUMER_KEY \
+                --secret $TWITTER_CONSUMER_SECRET
+```
 
 ## Setup
+
+### Mac or Linux 
+
+Install followme with Homebrew
+
+```shell
+brew tap mchmarny/followme
+brew install followme
+```
+
+New release will be automatically picked up with `brew upgrade`
+
+### Windows 
+
+Download [latest release](https://github.com/mchmarny/followme/releases/latest) and place it in your path.
 
 ## Disclaimer
 
