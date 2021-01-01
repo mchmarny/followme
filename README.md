@@ -8,6 +8,16 @@ While there are a few services available on-line to track your followers and unf
 
 followme app requires only read-only access to your Twitter account, uses only public data already available about your account, and keeps your data locally, on your device. 
 
+## Setup 
+
+To use followme you will need Twitter consumer key (API key) and consumer secret:
+
+1. Navigate to https://dev.twitter.com/apps/new and log in
+2. Enter your `followme` or similar and description (leave URL empty)
+3. Accept the TOS, and solve the CAPTCHA.
+4. Submit the form by clicking the Create your Twitter Application
+5. Copy the consumer key and consumer secret to use with followme app and worker
+
 ## Usage
 
 > For both app and the worker you can either provide the `--key` and `--secret` flags of define the `TWITTER_CONSUMER_KEY` and `TWITTER_CONSUMER_SECRET` variables
@@ -31,7 +41,7 @@ followme worker --key $YOUR_TWITTER_CONSUMER_KEY \
                 --secret $TWITTER_CONSUMER_SECRET
 ```
 
-## Setup
+## Install
 
 ### Mac or Linux 
 
