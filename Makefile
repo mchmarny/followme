@@ -1,5 +1,5 @@
 APP_NAME         ?=followme
-APP_VERSION      ?=v0.3.1
+APP_VERSION      ?=v0.3.2
 
 .PHONY: all
 all: help
@@ -13,6 +13,12 @@ tidy: ## Updates go modules and vendors deps
 test: tidy ## Tests the entire project 
 	go test -count=1 -race -covermode=atomic -coverprofile=cover.out ./...
 
+.PHONY: static 
+static: ## Makes static content into binary data
+	go get github.com/go-bindata/go-bindata/...
+	go-bindata -o internal/app/static.go -pkg app -fs -prefix "web/static" web/...
+	go mod tidy
+	
 .PHONY: build 
 build: tidy ## Builds app locally (/bin)
 	CGO_ENABLED=0 go build \

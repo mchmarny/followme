@@ -1,9 +1,14 @@
 package app
 
 import (
+	"bytes"
 	"fmt"
+	"html/template"
 	"log"
+	"net/http"
 	"os"
+	"path"
+	"time"
 
 	"github.com/asdine/storm/v3"
 	"github.com/gin-gonic/gin"
@@ -83,10 +88,26 @@ func (a *App) Run() error {
 	r := gin.New()
 	r.Use(gin.Recovery())
 
+	// templates
+	if err := a.setTemplates(r); err != nil {
+		return err
+	}
+
 	// static
-	r.LoadHTMLGlob("./web/template/*")
-	r.Static("/static", "./web/static")
-	r.StaticFile("/favicon.ico", "./web/static/img/favicon.ico")
+	r.StaticFS("/static", AssetFile())
+
+	// fave
+	r.GET("/favicon.ico", func(c *gin.Context) {
+		b, err := Asset("web/static/img/favicon.ico")
+		if err != nil {
+			a.logger.Printf("error reading favicon.ico: %v", err)
+			c.Abort()
+			return
+		}
+		reader := bytes.NewReader(b)
+		c.Header("Content-Type", "image/x-icon")
+		http.ServeContent(c.Writer, c.Request, "favicon.ico", time.Now(), reader)
+	})
 
 	// routes
 	r.GET("/", a.defaultHandler)
@@ -118,6 +139,29 @@ func (a *App) Run() error {
 	a.logger.Printf("App starting: %s \n", a.hostPort)
 	if err := r.Run(a.hostPort); err != nil {
 		return errors.Wrap(err, "error while running app server")
+	}
+	return nil
+}
+
+func (a *App) setTemplates(r *gin.Engine) error {
+	templateFiles, err := AssetDir("web/template")
+	if err != nil {
+		return errors.Wrap(err, "error laoding tempalates")
+	}
+
+	mt := template.New("")
+	for _, f := range templateFiles {
+		p := path.Join("web/template", f)
+		// a.logger.Printf("loading template: %s", p)
+		b, err := Asset(p)
+		if err != nil {
+			return errors.Wrapf(err, "error getting asset from: %s", p)
+		}
+		t, err := mt.New(f).Parse(string(b))
+		if err != nil {
+			return errors.Wrapf(err, "error parsing tempalate: %s", p)
+		}
+		r.SetHTMLTemplate(t)
 	}
 	return nil
 }

@@ -139,3 +139,16 @@ jobs:
           asset_path: ${{ env.ARTIFACT_DIR }}/followme-windows
           asset_name: followme.exe
           asset_content_type: application/octet-stream
+
+
+      # - name: Homebrew formula bump
+      #   uses: dawidd6/action-homebrew-bump-formula@v3.5.1
+      #   with:
+      #     token: ${{secrets.TOKEN}}
+      #     tap: mchmarny/homebrew-followme
+      #     base-branch: main
+      #     formula: followme
+      #     tag: ${{github.ref}}
+      #     revision: ${{github.sha}}
+      #     download-url: https://example.com/foo/v0.1.tar.gz
+      #     force: true
