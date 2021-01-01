@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/mchmarny/followme/internal/app"
+	"github.com/mchmarny/followme/internal/data"
 	"github.com/mchmarny/followme/internal/worker"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
@@ -31,6 +32,13 @@ func main() {
 			EnvVars:  []string{"TWITTER_CONSUMER_SECRET"},
 			Required: true,
 		},
+		&cli.StringFlag{
+			Name:    "file",
+			Aliases: []string{"f"},
+			Usage:   "Data file path",
+			EnvVars: []string{"DATA_FILE_PATH"},
+			Value:   data.GetDefaultDBFilePath(),
+		},
 	}
 
 	appCmd := &cli.App{
@@ -50,24 +58,25 @@ func main() {
 				Flags: []cli.Flag{
 					flags[0],
 					flags[1],
+					flags[2],
 					&cli.IntFlag{
-						Name:        "port",
-						Aliases:     []string{"p"},
-						Usage:       "app server port",
-						Value:       8080,
-						DefaultText: "8080",
+						Name:    "port",
+						Aliases: []string{"p"},
+						Usage:   "app server port",
+						EnvVars: []string{"APP_PORT"},
+						Value:   8080,
 					},
 					&cli.StringFlag{
-						Name:        "url",
-						Aliases:     []string{"u"},
-						Usage:       "app server base URL",
-						Value:       "http://127.0.0.1",
-						DefaultText: "http://127.0.0.1",
+						Name:    "url",
+						Aliases: []string{"u"},
+						Usage:   "app server base URL",
+						EnvVars: []string{"APP_URL"},
+						Value:   "http://127.0.0.1",
 					},
 				},
 				Action: func(c *cli.Context) error {
-					a, err := app.NewApp(c.String("key"), c.String("secret"),
-						c.String("url"), Version, c.Int("port"))
+					a, err := app.NewApp(c.String("file"), c.String("key"),
+						c.String("secret"), c.String("url"), Version, c.Int("port"))
 					if err != nil {
 						return errors.Wrap(err, "error creating new app service")
 					}
@@ -79,8 +88,8 @@ func main() {
 				Usage: "run worker",
 				Flags: flags,
 				Action: func(c *cli.Context) error {
-					w, err := worker.NewWorker(c.String("key"), c.String("secret"),
-						c.String("url"), Version)
+					w, err := worker.NewWorker(c.String("file"), c.String("key"),
+						c.String("secret"), c.String("url"), Version)
 					if err != nil {
 						return errors.Wrap(err, "error creating new worker service")
 					}

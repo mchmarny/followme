@@ -15,7 +15,7 @@ import (
 )
 
 // NewWorker creates a new instance of the worker
-func NewWorker(key, secret, url, version string) (*Worker, error) {
+func NewWorker(dbPath, key, secret, url, version string) (*Worker, error) {
 	if key == "" || secret == "" || version == "" {
 		return nil, errors.New("key, secret, and version required")
 	}
@@ -24,7 +24,7 @@ func NewWorker(key, secret, url, version string) (*Worker, error) {
 	logger := log.New(os.Stdout, "worker: ", 0)
 
 	// data
-	db, err := data.GetDB()
+	db, err := data.GetDB(dbPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting DB")
 	}

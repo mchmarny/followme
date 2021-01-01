@@ -22,7 +22,7 @@ import (
 )
 
 // NewApp creates a new instance of the app
-func NewApp(key, secret, url, version string, port int) (*App, error) {
+func NewApp(dbPath, key, secret, url, version string, port int) (*App, error) {
 	if key == "" || secret == "" || version == "" {
 		return nil, errors.New("key, secret, and version required")
 	}
@@ -31,7 +31,7 @@ func NewApp(key, secret, url, version string, port int) (*App, error) {
 	logger := log.New(os.Stdout, "", 0)
 
 	// data
-	db, err := data.GetDB()
+	db, err := data.GetDB(dbPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting DB")
 	}
