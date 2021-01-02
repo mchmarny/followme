@@ -48,10 +48,9 @@ func (a *App) dashboardQueryHandler(c *gin.Context) {
 		return
 	}
 
-	var state data.DailyState
-	stateKey := data.GetDailyStateKey(forUser.Username, time.Now().UTC())
-	if err := a.db.One("Key", stateKey, &state); err != nil {
-		a.errJSONAndAbort(c, errors.Wrapf(err, "error getting user state for %s", stateKey))
+	state, err := a.getState(forUser.Username, format.ToISODate(time.Now().UTC()))
+	if err != nil {
+		a.errJSONAndAbort(c, errors.Wrap(err, "error getting current user state"))
 		return
 	}
 
@@ -71,7 +70,7 @@ func (a *App) dashboardQueryHandler(c *gin.Context) {
 
 	for i, date := range date.GetDateRange(time.Now().UTC().AddDate(0, 0, -days)) {
 		day := i + 1
-		dayState, err := a.getState(forUser.Username, date)
+		dayState, err := a.getState(forUser.Username, format.ToISODate(date))
 		if err != nil {
 			a.errJSONAndAbort(c, errors.Wrapf(err, "error getting user state for %v", date))
 			return
@@ -164,8 +163,9 @@ func (a *App) dayQueryHandler(c *gin.Context) {
 	}
 
 	var (
-		ids       []int64
-		eventType string
+		ids        []int64
+		eventType  string
+		followVerb string = "You Follow"
 	)
 
 	switch listType {
@@ -180,10 +180,12 @@ func (a *App) dayQueryHandler(c *gin.Context) {
 	case data.FriendedEventType:
 		ids = state.NewFriends
 		eventType = data.FriendedEventType
+		followVerb = "Follows You"
 
 	case data.UnfriendedEventType:
 		ids = state.NewUnfriended
 		eventType = data.UnfriendedEventType
+		followVerb = "Follows You"
 
 	default:
 		a.errJSONAndAbort(c, errors.Wrapf(err, "invalid list type: %s", listType))
@@ -247,12 +249,12 @@ func (a *App) dayQueryHandler(c *gin.Context) {
 		"pageNext":   idPager.GetNextPage(),
 		"hasPrev":    idPager.HasPrev(),
 		"hasNext":    idPager.HasNext(),
+		"followVerb": followVerb,
 	})
 }
 
-func (a *App) getState(username string, date time.Time) (*data.DailyState, error) {
-	key := data.GetDailyStateKey(username, date)
-	ds := format.ToISODate(date)
+func (a *App) getState(username, isoDate string) (*data.DailyState, error) {
+	key := data.GetDailyStateKeyISO(username, isoDate)
 	var s data.DailyState
 	if err := a.db.One("Key", key, &s); err != nil {
 		if err != storm.ErrNotFound {
@@ -261,7 +263,7 @@ func (a *App) getState(username string, date time.Time) (*data.DailyState, error
 		s = data.DailyState{
 			Key:      key,
 			Username: username,
-			StateOn:  ds,
+			StateOn:  isoDate,
 		}
 	}
 	return &s, nil

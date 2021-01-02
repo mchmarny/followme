@@ -15,7 +15,13 @@ $(function () {
             loadDay($("#list-selector").val(), $(this).data("page")); // on click
         });
 
-        loadDay($("#list-selector").val(), 0); // on load
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has("qt")) {
+            $("#list-selector").val(urlParams.get("qt"));
+            loadDay(urlParams.get("qt"), 0);
+        }else{
+            loadDay($("#list-selector").val(), 0);
+        }
     };
 });
 
@@ -23,11 +29,14 @@ function loadDay(listType, page) {
     $(".after-load").hide();
     var selectedDate = $("#selectedDate").val();
     var table = $("#events-table tbody");
+    var followVerb = $("#followVerb");
     table.empty();
     queryURL = "/data/day/" + selectedDate + "/list/" + listType + "/page/" + page;
     // console.log("Query URL: " + queryURL);
     $.get(queryURL, function (data) {
         //console.log(data);
+
+        followVerb.html(data.followVerb);
 
         var prevLink = $("#day-list-prev");
         var nextLink = $("#day-list-next");
@@ -120,7 +129,7 @@ function loadDashboard(days) {
             data: {
                 labels: Object.keys(data.series.new_followers),
                 datasets: [{
-                    label: 'Unfollowed',
+                    label: 'unfollowed',
                     data: Object.values(data.series.lost_followers),
                     backgroundColor: 'rgba(206, 149, 166,0.1)',
                     borderColor: 'rgba(206, 149, 166,0.5)',
@@ -128,7 +137,7 @@ function loadDashboard(days) {
                     minBarLength: 2,
                 },
                 {
-                    label: 'Followed',
+                    label: 'followed',
                     data: Object.values(data.series.new_followers),
                     backgroundColor: 'rgba(127, 201, 143,0.1)',
                     borderColor: 'rgba(127, 201, 143,0.5)',
@@ -136,14 +145,14 @@ function loadDashboard(days) {
                     minBarLength: 2,
                 },
                 {
-                    label: 'Friended',
+                    label: 'friended',
                     data: Object.values(data.series.new_friends),
                     backgroundColor: 'rgba(127, 201, 143,0.4)',
                     borderColor: 'rgba(127, 201, 143,0.7)',
                     borderWidth: 1,
                     minBarLength: 2
                 }, {
-                    label: 'Unfriended',
+                    label: 'unfriended',
                     data: Object.values(data.series.lost_friends),
                     backgroundColor: 'rgba(206, 149, 166,0.4)',
                     borderColor: 'rgba(206, 149, 166,0.7)',
@@ -151,7 +160,7 @@ function loadDashboard(days) {
                     minBarLength: 2
                 }, 
                 {
-                    label: 'Follower Average',
+                    label: 'average',
                     type: 'line',
                     fill: false,
                     data: Object.values(data.series.avg_followers),
@@ -166,7 +175,7 @@ function loadDashboard(days) {
                 maintainAspectRatio: false,
                 title: {
                     display: true,
-                    text: 'Events - whom you (un)followed and who (un)friended you',
+                    text: 'Who (un)followed and whom you (un)friended - click day for details',
                     fontColor: 'rgba(250, 250, 250, 0.5)',
                     fontSize: 16,
                 },
@@ -204,8 +213,8 @@ function loadDashboard(days) {
                 onClick: (evt, item) => {
                     if (item.length) {
                         var model = item[0]._model;
-                        console.log("Date: ", model.label);
-                        redirectToDate(model.label);
+                        // console.log("Date: ", model);
+                        $(location).attr("href", "/view/day/" + model.label + "?qt=" + model.datasetLabel);
                     }
                 }
             }
@@ -240,7 +249,7 @@ function loadDashboard(days) {
                 maintainAspectRatio: false,
                 title: {
                     display: true,
-                    text: 'Totals - number of followers per day',
+                    text: 'Totals number of followers per day',
                     fontColor: 'rgba(250, 250, 250, 0.5)',
                     fontSize: 16,
                 },
@@ -282,27 +291,6 @@ function loadDashboard(days) {
         console.log("error loading twitter data");
         // $(location).attr("href", "/logout");
     });
-}
-
-function redirectToDate(d) {
-    $(location).attr("href", "/view/day/" + d);
-}
-
-function makeLinks() {
-    var tweetText = $(".tweet-text");
-    if (tweetText.length) {
-        tweetText.each(
-            function () {
-                var $words = $(this).text().split(' ');
-                for (i in $words) {
-                    if ($words[i].indexOf('https://t.co/') == 0) {
-                        $words[i] = '<a href="' + $words[i] + '" target="_blank">' + $words[i] + '</a>';
-                    }
-                }
-                $(this).html($words.join(' '));
-            }
-        );
-    }
 }
 
 $.fn.digits = function () {
