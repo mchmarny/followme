@@ -3,6 +3,7 @@ package app
 import (
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/asdine/storm/v3"
@@ -272,9 +273,15 @@ func (a *App) getState(username, isoDate string) (*data.DailyState, error) {
 // errJSONAndAbort throws JSON error and abort prevents pending handlers from being called
 func (a *App) errJSONAndAbort(c *gin.Context, err error) {
 	a.logger.Printf("error while processing JSON request: %v", err)
-	c.JSON(http.StatusInternalServerError, gin.H{
-		"message": "Internal server error, see logs for details",
+	code := http.StatusInternalServerError
+	msg := strings.ToLower(err.Error())
+
+	if strings.Contains(msg, strings.ToLower("401 unauthorized")) {
+		code = http.StatusUnauthorized
+	}
+
+	c.AbortWithStatusJSON(code, gin.H{
+		"message": err.Error(),
 		"status":  "Error",
 	})
-	c.Abort()
 }

@@ -1,4 +1,6 @@
 $(function () {
+    $(".error-msg").hide();
+
     if ($("#numbers-section").length) {
         loadDashboard("2");
         $("#day-selector").change(function(){
@@ -95,11 +97,8 @@ function loadDay(listType, page) {
             window.open("https://twitter.com/" + $(this).data('user'), "_blank");
         });
     
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR);
-        console.log(textStatus);
-        console.log(errorThrown);
-        $("#error-msg").html("Error loading date data, see logs for details.").show()
+    }).fail(function(jqXHR) {
+        handleError(jqXHR)
     });
 }
 
@@ -284,12 +283,8 @@ function loadDashboard(days) {
 
 
 
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR);
-        console.log(textStatus);
-        console.log(errorThrown);
-        console.log("error loading twitter data");
-        // $(location).attr("href", "/logout");
+    }).fail(function(jqXHR) {
+        handleError(jqXHR)
     });
 }
 
@@ -297,4 +292,15 @@ $.fn.digits = function () {
     return this.each(function () {
         $(this).text($(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
     });
+}
+
+function handleError(jqXHR){
+    console.log(jqXHR);
+    
+    if (jqXHR.status == 401){
+        $(location).attr("href", "/auth/logout");
+        return
+    }
+    
+    $(".error-msg").html("Error loading date data, see logs for details.").show()
 }

@@ -349,19 +349,6 @@ h3 {
 	margin: 2px 1px;
 }
 
-#profile-column-left {
-	width: 250px;
-	height: auto;
-	float: left;
-	text-align: right;
-  }
-
-#profile-column-left img {
-	width: 100px;
-	height: 100px;
-	margin: 0 20px 30px 0;
-  }
-
 .event-data {
 	margin: 0 20px 30px 0;
 	color: #e4e4e4;
@@ -395,10 +382,10 @@ h3 {
 }
 
 .error-msg {
-	visibility: hidden;
 	color: red;
 	font-size: 1em;
 	break-after: always;
 	display: block;
 	text-align: center;
+	margin: 0 50px 0 50px;
 }
