@@ -47,7 +47,7 @@ func (a *App) reportDataHandler(c *gin.Context) {
 		startIDStr = "0"
 	}
 	var pageErr error
-	startID, err := strconv.ParseInt(startIDStr, 10, 32)
+	startID, pageErr := strconv.ParseInt(startIDStr, 10, 32)
 	if pageErr != nil {
 		a.errJSONAndAbort(c, errors.Wrap(pageErr, "error parsing start ID number"))
 		return
