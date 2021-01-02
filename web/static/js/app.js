@@ -25,18 +25,91 @@ $(function () {
             loadDay($("#list-selector").val(), 0);
         }
     };
+
+    if ($("#report-table").length) {
+        $("#report-list-more").click(function(e){
+            e.preventDefault();
+            loadReport(); // on click
+        });
+        loadReport() // on load
+    };
 });
 
+function setupDataTable() {
+    $(".no-link").click(function(e){
+        e.preventDefault();
+    });
+
+    $(".user-data-row").on("mouseover", function() {
+        $(this).closest("tr").addClass("highlight");
+        $(this).closest("table").find(".user-data-row:nth-child(" + ($(this).index() + 1) + ")").addClass("highlight");
+    });
+
+    $(".user-data-row").on("mouseout", function() {
+        $(this).closest("tr").removeClass("highlight");
+        $(this).closest("table").find(".user-data-row:nth-child(" + ($(this).index() + 1) + ")").removeClass("highlight");
+    });
+
+    $(".user-data-row").click(function(){
+        window.open("https://twitter.com/" + $(this).data('user'), "_blank");
+    });
+}
+
+
+function loadReport() {
+    var table = $("#report-table tbody");
+    var moreButton = $("#report-list-more");
+    table.empty();
+    queryURL = "/data/report/" + moreButton.data("id");
+    console.log("Query URL: " + queryURL);
+    $.get(queryURL, function (data) {
+        // console.log(data);
+
+        moreButton.data("id", data.lastID);
+
+        if (data.hasMore) {
+            moreButton.show();
+        }else{
+            moreButton.hide();
+        }
+        
+        $.each(data.list, function(rowIndex, e) {
+            // console.log("row[" + rowIndex + "]: " + e.username);
+            var row = $(`<tr class="user-data-row" data-user="${e.username}"/>`);
+            row.append(`<td class="user-img">
+                    <a href="#" class="no-link" 
+                       title="${e.description} - (updated: ${e.updated_at})">
+                        <img src="${e.profile_image}" class="profile-image" />
+                    </a>
+                </td>`);
+            row.append(`<td class="user-name">
+                <a href="#" class="no-link" 
+                   title="${e.description} - (updated: ${e.updated_at})">
+                    @${e.username}</a><div>${e.name}<br />${e.location}</div>
+                </td>`);
+            row.append(`<td class="user-data"><div>${e.friend_count}</div></td>`); 
+            row.append(`<td class="user-data"><div>${e.followers_count}</div></td>`); 
+            row.append(`<td class="user-data"><div>${e.post_count}</div></td>`); 
+            row.append(`<td class="user-data"><div>${e.listed_count}</div></td>`); 
+            table.append(row);
+        });
+
+        setupDataTable();
+    
+    }).fail(function(jqXHR) {
+        handleError(jqXHR)
+    });
+}
+
 function loadDay(listType, page) {
-    $(".after-load").hide();
     var selectedDate = $("#selectedDate").val();
     var table = $("#events-table tbody");
     var followVerb = $("#followVerb");
     table.empty();
     queryURL = "/data/day/" + selectedDate + "/list/" + listType + "/page/" + page;
-    // console.log("Query URL: " + queryURL);
+    console.log("Query URL: " + queryURL);
     $.get(queryURL, function (data) {
-        //console.log(data);
+        // console.log(data);
 
         followVerb.html(data.followVerb);
 
@@ -59,6 +132,7 @@ function loadDay(listType, page) {
         }
         
         $.each(data.events, function(rowIndex, e) {
+            // console.log("row[" + rowIndex + "]: " + e.username);
             var row = $(`<tr class="user-data-row" data-user="${e.username}"/>`);
             row.append(`<td class="user-img">
                     <a href="#" class="no-link" 
@@ -79,23 +153,7 @@ function loadDay(listType, page) {
             table.append(row);
         });
 
-        $(".no-link").click(function(e){
-            e.preventDefault();
-        });
-
-        $(".user-data-row").on("mouseover", function() {
-            $(this).closest("tr").addClass("highlight");
-            $(this).closest("table").find(".user-data-row:nth-child(" + ($(this).index() + 1) + ")").addClass("highlight");
-        });
-    
-        $(".user-data-row").on("mouseout", function() {
-            $(this).closest("tr").removeClass("highlight");
-            $(this).closest("table").find(".user-data-row:nth-child(" + ($(this).index() + 1) + ")").removeClass("highlight");
-        });
-
-        $(".user-data-row").click(function(){
-            window.open("https://twitter.com/" + $(this).data('user'), "_blank");
-        });
+        setupDataTable();
     
     }).fail(function(jqXHR) {
         handleError(jqXHR)
@@ -103,7 +161,6 @@ function loadDay(listType, page) {
 }
 
 function loadDashboard(days) {
-    $(".after-load").hide();
     // console.log("period days: " + days);
     $.get("/data/dash?days=" + days, function (data) {
         // console.log(data);
@@ -118,7 +175,6 @@ function loadDashboard(days) {
         $("#meta-updated-on").text(data.updated_on);
 
         $(".wait-load").hide();
-        $(".after-load").show();
 
         // follower count chart
         $("#follower-event-series").remove();
@@ -296,11 +352,15 @@ $.fn.digits = function () {
 
 function handleError(jqXHR){
     console.log(jqXHR);
-    
-    if (jqXHR.status == 401){
-        $(location).attr("href", "/auth/logout");
-        return
+    if (jqXHR) {
+        if (jqXHR.status == 401){
+            $(location).attr("href", "/auth/logout");
+            return
+        }
+        if (jqXHR.responseJSON) {
+            $(".error-msg").html(jqXHR.responseJSON.message).show();
+            return;
+        }
     }
-    
     $(".error-msg").html("Error loading date data, see logs for details.").show()
 }

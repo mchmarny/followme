@@ -73,10 +73,17 @@ func main() {
 						EnvVars: []string{"APP_URL"},
 						Value:   "http://127.0.0.1",
 					},
+					&cli.BoolFlag{
+						Name:    "dev",
+						Aliases: []string{"d"},
+						Usage:   "Developer mode",
+						EnvVars: []string{"DEV_MODE"},
+						Value:   false,
+					},
 				},
 				Action: func(c *cli.Context) error {
 					a, err := app.NewApp(c.String("file"), c.String("key"),
-						c.String("secret"), c.String("url"), Version, c.Int("port"))
+						c.String("secret"), c.String("url"), Version, c.Int("port"), c.Bool("dev"))
 					if err != nil {
 						return errors.Wrap(err, "error creating new app service")
 					}

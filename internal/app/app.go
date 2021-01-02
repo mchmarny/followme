@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"strings"
 	"syscall"
 	"time"
 
@@ -22,7 +23,7 @@ import (
 )
 
 // NewApp creates a new instance of the app
-func NewApp(dbPath, key, secret, url, version string, port int) (*App, error) {
+func NewApp(dbPath, key, secret, url, version string, port int, dev bool) (*App, error) {
 	if key == "" || secret == "" || version == "" {
 		return nil, errors.New("key, secret, and version required")
 	}
@@ -64,6 +65,7 @@ func NewApp(dbPath, key, secret, url, version string, port int) (*App, error) {
 		maxSessionAge:      5.0,               // min
 		sessionCookieAge:   5 * 60,            // maxSessionAge in secs
 		appURL:             fmt.Sprintf("%s:%d", url, port),
+		devMode:            dev,
 	}, nil
 }
 
@@ -80,6 +82,7 @@ type App struct {
 	maxSessionAge      float64
 	sessionCookieAge   int
 	appURL             string
+	devMode            bool
 }
 
 // Run starts the app and blocks while running.
@@ -94,25 +97,9 @@ func (a *App) Run() error {
 	r.Use(gin.Recovery())
 
 	// templates
-	if err := a.setTemplates(r); err != nil {
+	if err := a.setStaticContent(r); err != nil {
 		return err
 	}
-
-	// static
-	r.StaticFS("/static", AssetFile())
-
-	// fave
-	r.GET("/favicon.ico", func(c *gin.Context) {
-		b, err := Asset("web/static/img/favicon.ico")
-		if err != nil {
-			a.logger.Printf("error reading favicon.ico: %v", err)
-			c.Abort()
-			return
-		}
-		reader := bytes.NewReader(b)
-		c.Header("Content-Type", "image/x-icon")
-		http.ServeContent(c.Writer, c.Request, "favicon.ico", time.Now(), reader)
-	})
 
 	// routes
 	r.GET("/", a.defaultHandler)
@@ -131,6 +118,7 @@ func (a *App) Run() error {
 	{
 		view.GET("/dash", a.dashboardHandler)
 		view.GET("/day/:day", a.dayHandler)
+		view.GET("/report", a.reportHandler)
 	}
 
 	data := r.Group("/data")
@@ -138,6 +126,7 @@ func (a *App) Run() error {
 	{
 		data.GET("/dash", a.dashboardQueryHandler)
 		data.GET("/day/:day/list/:list/page/:page", a.dayQueryHandler)
+		data.GET("/report/:id", a.reportDataHandler)
 	}
 
 	// signals
@@ -170,7 +159,16 @@ func (a *App) Run() error {
 	}
 }
 
-func (a *App) setTemplates(r *gin.Engine) error {
+func (a *App) setStaticContent(r *gin.Engine) error {
+	if a.devMode {
+		a.logger.Printf("loading external static resources")
+		r.LoadHTMLGlob("./web/template/*")
+		r.Static("/static", "./web/static")
+		r.StaticFile("/favicon.ico", "./web/static/img/favicon.ico")
+		return nil
+	}
+
+	// templates
 	templateFiles, err := AssetDir("web/template")
 	if err != nil {
 		return errors.Wrap(err, "error laoding tempalates")
@@ -190,5 +188,61 @@ func (a *App) setTemplates(r *gin.Engine) error {
 		}
 		r.SetHTMLTemplate(t)
 	}
+
+	// static
+	r.StaticFS("/static", AssetFile())
+
+	// fave
+	r.GET("/favicon.ico", func(c *gin.Context) {
+		b, err := Asset("web/static/img/favicon.ico")
+		if err != nil {
+			a.logger.Printf("error reading favicon.ico: %v", err)
+			c.Abort()
+			return
+		}
+		reader := bytes.NewReader(b)
+		c.Header("Content-Type", "image/x-icon")
+		http.ServeContent(c.Writer, c.Request, "favicon.ico", time.Now(), reader)
+	})
+
 	return nil
+}
+
+func (a *App) getState(username, isoDate string) (*data.DailyState, error) {
+	key := data.GetDailyStateKeyISO(username, isoDate)
+	var s data.DailyState
+	if err := a.db.One("Key", key, &s); err != nil {
+		if err != storm.ErrNotFound {
+			return nil, errors.Wrapf(err, "error getting state for %s", key)
+		}
+		s = data.DailyState{
+			Key:      key,
+			Username: username,
+			StateOn:  isoDate,
+		}
+	}
+	return &s, nil
+}
+
+// errJSONAndAbort throws JSON error and abort prevents pending handlers from being called
+func (a *App) errJSONAndAbort(c *gin.Context, err error) {
+	a.logger.Printf("error while processing JSON request: %v", err)
+	code := http.StatusInternalServerError
+	errMsg := strings.ToLower(err.Error())
+	msg := err.Error()
+
+	if strings.Contains(errMsg, strings.ToLower("401 unauthorized")) {
+		code = http.StatusUnauthorized
+		msg = "Unauthorized, please login again."
+	}
+
+	if strings.Contains(errMsg, strings.ToLower("429 too many requests")) {
+		code = http.StatusTooManyRequests
+		msg = "Too Many Requests, please wait a few minutes and try again."
+	}
+
+	c.AbortWithStatusJSON(code, gin.H{
+		"message": msg,
+		"status":  "Error",
+	})
 }

@@ -1,0 +1,43 @@
+{{ define "report" }}
+
+{{ template "header" . }}
+
+<!-- Middle -->
+
+<div id="middle-section">
+
+    <h3>Not Following You Back</h3>
+
+    <div class="error-msg"></div>
+
+    <!-- Table -->
+    <div class="list-table-wrapper">
+        <table class="list-table" id="report-table">
+            <thead>
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>Friends</th>
+                    <th>Followers</th>
+                    <th>Tweets</th>
+                    <th>Listed</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="page-nav">
+        <a href="#" id="report-list-more" class="page-button" data-id="0">More</a>
+    </div>
+
+</div>
+
+<!-- End Middle -->
+
+
+{{ template "footer" . }}
+
+{{ end }}

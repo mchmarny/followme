@@ -21,21 +21,6 @@ func (a *App) defaultHandler(c *gin.Context) {
 	})
 }
 
-func (a *App) dashboardHandler(c *gin.Context) {
-	profile, err := a.getUserProfile(c)
-	if err != nil {
-		a.logger.Printf("error getting profile: %v", err)
-		a.logOutHandler(c)
-		return
-	}
-
-	c.HTML(http.StatusOK, "dash", gin.H{
-		"user":    profile,
-		"version": a.appVersion,
-		"refresh": c.Query("refresh"),
-	})
-}
-
 func (a *App) getUserProfile(c *gin.Context) (*data.Profile, error) {
 	username, _ := c.Cookie(userIDCookieName)
 	if username == "" {

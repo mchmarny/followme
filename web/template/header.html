@@ -24,13 +24,14 @@
                 <img src="/static/img/tweethingz-logo.svg" id="logo" title="tweethingz logo" />
             </a>
             <div id="header-title">
-                Your Twitter Followers
+                Followme, your Twitter followers
             </div>
             {{ if .user }}
             <div id="header-nav">
                 <b><a href="https://twitter.com/{{ .user.Username }}" target="_blank">@{{ .user.Username }}</a></b>
                 <br />
                 <a href="/view/dash">Dashboard</a> |
+                <a href="/view/report">No Follow Backs</a> |
                 <a href="/auth/logout">Log out</a>
             </div>
             <img src="{{ .user.ProfileImage }}" id="header-pic" class="profile-image"

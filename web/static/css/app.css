@@ -45,6 +45,7 @@ h3 {
 	background-color: #333;
 	text-align: left;
 	height: 70px;
+	display: block;
 }
 
 #logo {
@@ -61,6 +62,7 @@ h3 {
 	height: 70px;
 	margin: 20px 0 0 10px;
 	color: rgb(109, 110, 110);
+	display: block;
 }
 
 #header-nav {
@@ -89,6 +91,7 @@ h3 {
 	width: 80%;
 	text-align: center;
 	break-after: always;
+	break-before: always;
 	display: inline-flex;
 	justify-content: center;
 }

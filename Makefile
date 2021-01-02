@@ -1,5 +1,5 @@
 APP_NAME         ?=followme
-APP_VERSION      ?=v0.3.12
+APP_VERSION      ?=v0.4.1
 
 .PHONY: all
 all: help
@@ -26,8 +26,8 @@ build: tidy ## Builds app locally (/bin)
 	-mod vendor -o bin/$(APP_NAME) ./cmd/
 
 .PHONY: app 
-app: ## Runs compiled app
-	bin/$(APP_NAME) app
+app: ## Runs compiled app in dev mode
+	bin/$(APP_NAME) app -d
 
 .PHONY: worker 
 worker: ## Runs compiled worker
