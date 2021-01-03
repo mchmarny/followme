@@ -54,15 +54,16 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
 
-    - name: Static
-      run: |
-        go get github.com/go-bindata/go-bindata/...
-        go-bindata -o internal/app/static.go -pkg app -fs -prefix "web/static" web/...
-
     - name: Tidy
       run: |
         go mod tidy 
         go mod vendor
+
+    - name: Static
+      run: |
+        go get github.com/go-bindata/go-bindata/...
+        go-bindata -o internal/app/static.go -pkg app -fs -prefix "web/static" web/...
+        go mod tidy
 
     - name: Lint
       if: matrix.target_arch == 'amd64' && matrix.target_os == 'linux'
