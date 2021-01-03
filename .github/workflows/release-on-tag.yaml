@@ -39,15 +39,16 @@ jobs:
     steps:
 
     - name: Setup (Go ${{ env.GO_VER }})
-      id: go
       uses: actions/setup-go@v2
+      id: go
       with:
         go-version: ${{ env.GO_VER }}
 
     - name: Checkout
       uses: actions/checkout@v2
 
-    - uses: actions/cache@v2
+    - name: Cache
+      uses: actions/cache@v2
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
@@ -62,6 +63,7 @@ jobs:
     - name: Static
       run: |
         go get -u github.com/go-bindata/go-bindata/...
+        echo $(which go-bindata)
         go-bindata -o internal/app/static.go -pkg app -fs -prefix "web/static" web/...
         go mod tidy
 
